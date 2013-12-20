@@ -19,7 +19,6 @@ def level_title(level):
 
 @register.filter('badge_count')
 def _badge_count(user_or_qs):
-    import pdb; pdb.set_trace()
     bc = badge_count(user_or_qs)
     return badge_count(user_or_qs)
 
