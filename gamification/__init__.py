@@ -1,8 +1,18 @@
 # -*- coding: utf-8 -*-
 
-__about__ = """
-In addition to what is provided by the "zero" project, this project
-provides thorough integration with django-user-accounts, adding
-comprehensive account management functionality. It is a foundation
-suitable for most sites that have user accounts.
-"""
+from gamification.core.models import Points
+from gamification.badges.utils import MetaBadge
+from gamification.badges.models import ProjectBadge
+
+def check_points(self,instance):
+    return False
+
+def create_badge_classes():
+    pbadges = ProjectBadge.objects.all()
+
+    for pbadge in pbadges:
+        cls = type(pbadge.name.encode('ascii','ignore'),(MetaBadge,),{'id':badge.id,'name':badge.name,'model':Points,'level':badge.level,'check_points':check_points})
+
+# create_badge_classes()
+
+

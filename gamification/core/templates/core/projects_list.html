@@ -1,0 +1,67 @@
+{% extends 'core/base.html' %}
+{% block content %}
+
+
+{% for project in profile %}
+
+<div class="row">
+    <div class="col-md-6 col-md-offset-2">
+        <div class="page-header">
+            <h2>Project Leaders for {{ project.description }}</h2>
+        </div>
+    </div>
+</div>
+
+
+
+{% for badge in project.badges %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 col-md-offset-2">
+            <div class="page-header">
+                <h3  style="background: lightskyblue;">{{ badge.description }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-10 col-md-offset-1">
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Points Received</th>
+                    <th>Badges Awarded</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for winner in badge.winners %}
+                <tr>
+                    <td>
+                        {{ winner.user__username }}
+                    </td>
+                    <td>
+                        {{ winner.points_count }}
+                    </td>
+                    <td>
+                        TODO
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- div class="row">
+        <div class="col-md-4 col-md-offset-1">
+            <h3>Total Points: {{ badge.total }}</h3>
+        </div>
+    </div -->
+</div>
+
+{% endfor %}
+{% endfor %}
+{% endblock %}
+
+
+

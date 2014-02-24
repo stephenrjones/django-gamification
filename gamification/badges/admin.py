@@ -14,7 +14,11 @@ class ProjectBadgeAdmin(admin.ModelAdmin):
     fields = ('name','description','project','badge')
     list_display = ('name', 'description')
 
+class BadgeSettingsAdmin(admin.ModelAdmin):
+    fields = ('awardLevel','multipleAwards')
+    list_display = ('awardLevel','multipleAwards')
+
 
 admin.site.register(Badge, BadgeAdmin)
-admin.site.register(BadgeSettings, SingletonModelAdmin)
+admin.site.register(BadgeSettings, BadgeSettingsAdmin)
 admin.site.register(ProjectBadge, ProjectBadgeAdmin)

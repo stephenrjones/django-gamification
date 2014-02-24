@@ -58,7 +58,8 @@ class ProjectBadge(models.Model):
     name = models.CharField(max_length=255)    
     description = models.TextField()
     created = models.DateTimeField(default=datetime.now)
-    # settings = models.ForeignKey('BadgeSettings')
+    awardLevel = models.IntegerField(default=1000)
+    multipleAwards = models.BooleanField(default=True)
 
     @property
     def meta_badge(self):
@@ -94,13 +95,15 @@ class ProjectBadge(models.Model):
             kwargs.update(dict(user__in=user_or_qs))
         return ProjectBadgeToUser.objects.filter(**kwargs).count()
 
+    def __str__(self):
+        return self.name
+
 class ProjectBadgeToUser(models.Model):
     projectbadge = models.ForeignKey(ProjectBadge)
     user = models.ForeignKey(User)
-    
-    
     created = models.DateTimeField(default=datetime.now)
-#TODO: should this get moved into a general settings?
-class BadgeSettings(SingletonModel):
-    startScore = models.IntegerField(default=1)
-    rewardPoints = models.IntegerField(default=5)
+
+
+class BadgeSettings(models.Model):
+    awardLevel = models.IntegerField(default=1000)
+    multipleAwards = models.BooleanField(default=True)

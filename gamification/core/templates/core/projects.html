@@ -1,0 +1,61 @@
+{% extends "core/base.html" %}
+{% block content %}
+{% block heading %}
+
+<div class="row">
+    <div class="col-md-6 col-md-offset-2">
+        <div class="page-header">
+            <h2>System Projects</h2>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-10 col-md-offset-1">
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>Project Name</th>
+                    <th>Project Description</th>
+                    <th>Created</th>
+                    <th>Awards Available</th>
+                    <th>Project Leaderboard</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for project in object_list %}
+                <tr>
+                    <td>
+                        {{ project.name }}
+                    </td>
+                    <td>
+                        {{ project.description }}
+                    </td>
+                    <td>
+                        {{ project.created_at }}
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-default btn-sm" onclick="location.href='/projects/{{ project.name }}/badges'">
+                            <span class="glyphicon glyphicon-list" ></span>
+                        </button>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-default btn-sm" onclick="location.href='/projects/{{ project.name }}'">
+                            <span class="glyphicon glyphicon-list" ></span>
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+
+

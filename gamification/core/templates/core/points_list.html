@@ -1,0 +1,78 @@
+{% extends 'core/base.html' %}
+
+{% block heading %}
+
+<div class="row">
+    <div class="col-md-6 col-md-offset-2">
+        <div class="page-header">
+            <h2>Points</h2>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+
+{% block content %}
+{% for project in profile %}
+        <div class="row" style="background: lightskyblue;">
+            <div class="col-md-4 col-md-offset-4">
+                <h3>{{ project.description }}</h3>
+            </div>
+        </div>
+        <div class="row"><br/></div>
+{% for badge in project.badges %}
+{% if badge.total %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-10 col-md-offset-1">
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>Award Name</th>
+                    <th>Points Received</th>
+                    <th>Date</th>
+                    <th>Comment</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for award in badge.awarded %}
+                <tr>
+                    <td>
+                        {{ badge.name }}
+                    </td>
+                    <td>
+                        {{ award.value }}
+                    </td>
+                    <td>
+                        {{ award.date_awarded|date:"SHORT_DATE_FORMAT" }} at {{ award.date_awarded|time:"H:i" }}
+                    </td>
+                    <td>
+                        {{ award.description }}
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 col-md-offset-1">
+            <h3>{{ badge.total }} {{ badge.name }} Points Accumulated</h3>
+        </div>
+    </div>
+    <hr/>
+</div>
+{% endif %}
+{% endfor %}
+<div class="row">
+    <div class="col-md-2 col-md-offset-5">
+        <button type="button" class="btn btn-primary" onclick="location.href='/users/steve/projects/{{ project.name }}/award'">Submit Award</button>
+    </div>
+</div>
+        <br/><br/>
+{% endfor %}
+{% endblock %}
+
+
+

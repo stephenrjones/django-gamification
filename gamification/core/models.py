@@ -29,6 +29,7 @@ from django.core.urlresolvers import reverse
 from django.utils.datastructures import SortedDict
 from django.db.models.signals import post_save
 from django.db import models
+from gamification.badges.models import ProjectBadge
 
 
 TRUE_FALSE = [(0, 'False'), (1, 'True')]
@@ -67,6 +68,17 @@ class Project(ProjectBase):
 
     def get_absolute_url(self):
         return reverse('project-detail', args=[self.id])
+
+
+class Points(models.Model):
+    user = models.ForeignKey(User)
+    projectbadge = models.ForeignKey(ProjectBadge)
+    value = models.IntegerField(default=0)
+    date_awarded = models.DateTimeField('date awarded',auto_now=True)
+    description = models.CharField(max_length=200)
+
+    def get_absolute_url(self):
+        return reverse('points-list', args=[self.id])
 
 
 

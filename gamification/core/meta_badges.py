@@ -24,13 +24,13 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-from gamification.core.models import Project
+from gamification.core.models import Points
 from gamification.badges import MetaBadge
 
 class Gold(MetaBadge):
     id = 1
     name = "Gold"
-    model = Project
+    model = Points
     one_time_only = False
     title = "Gold Award"
     level = "1"
@@ -41,7 +41,7 @@ class Gold(MetaBadge):
 class Silver(MetaBadge):
     id = 2    
     name = "Silver"
-    model = Project
+    model = Points
     one_time_only = False
     title = "Silver Award"
     level = "2"
@@ -53,7 +53,7 @@ class Silver(MetaBadge):
 class Bronze(MetaBadge):
     id = 3    
     name = "Bronze"
-    model = Project
+    model = Points
     one_time_only = False
     title = "Bronze Award"
     level = "3"
