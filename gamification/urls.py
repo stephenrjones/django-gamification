@@ -32,25 +32,22 @@ from django.views.generic import TemplateView, ListView
 from django.contrib import admin
 admin.autodiscover()
 from gamification.core.models import Project
-from gamification.core.api import ProjectBadgeResource, UserResource
-from gamification.core.views import MasterProjectListView, ProjectListView, UserProjectPointsView, BadgeListView, UserView
-from tastypie.api import Api
+from gamification.core.views import MasterProjectListView, ProjectListView, UserProjectPointsView, BadgeListView, UserView, \
+                                    MasterBadgeListView, master_project_list
 
-g_api = Api(api_name='v1')
-g_api.register(ProjectBadgeResource())
-g_api.register(UserResource())
 
 urlpatterns = patterns("",
     url(r"^gamification/$", TemplateView.as_view(template_name="core/index.html"), name="home"),
     url(r"^admin/", include(admin.site.urls)),
     url(r"^account/", include("account.urls")),
-    url(r"^api/", include(g_api.urls)),
     url(r"^users/?$", UserView.as_view(template_name='core/users.html'), name='user_list'),
     url(r"^users/(?P<username>\w+)/", include("gamification.core.urls")),
-    url(r"^projects/?$", ListView.as_view(queryset=Project.objects.all(), template_name='core/projects.html')),
+    # url(r"^projects/?$", ListView.as_view(queryset=Project.objects.all(), template_name='core/projects.html')),
+    url(r"^projects/$", master_project_list),
     url(r"^projects/all/", MasterProjectListView.as_view(template_name='core/masterprojects_list.html'), name='master-project-list'),
     url(r"^projects/(?P<projectname>\w+)/?$", ProjectListView.as_view(template_name='core/projects_list.html'), name='project-list'),
     url(r"^projects/(?P<projectname>\w+)/badges/?$", BadgeListView.as_view(template_name='core/badge_list.html'), name='badge-list'),
+    url(r'^badges/?$', MasterBadgeListView.as_view(template_name='core/master_badge_list.html'), name='master-badge-list'),
 )
 
 # urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
