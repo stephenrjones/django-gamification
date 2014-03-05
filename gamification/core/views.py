@@ -37,6 +37,10 @@ from gamification.badges.utils import project_badge_count
 from gamification.core.utils import badge_count,top_n_badge_winners,user_project_badge_count
 from gamification.core.models import Project
 from gamification.core.forms import AwardForm
+from gamification.core.serializers import ProjectSerializer, PointsSerializer
+from rest_framework import renderers
+from rest_framework.decorators import api_view, renderer_classes
+from rest_framework.response import Response
 
 
 class PointsListView(ListView):
@@ -108,6 +112,17 @@ class BadgeListView(ListView):
     def get_context_data(self, **kwargs):
         cv = super(BadgeListView, self).get_context_data(**kwargs)
         cv['project_name'] = self.kwargs['projectname']
+        return cv
+
+class MasterBadgeListView(ListView):
+
+    model = ProjectBadge
+
+    def get_queryset(self):
+        return ProjectBadge.objects.all().values('name','description','created','awardLevel','multipleAwards','project__description','badge__icon').order_by('project__description')
+
+    def get_context_data(self, **kwargs):
+        cv = super(MasterBadgeListView, self).get_context_data(**kwargs)
         return cv
 
 class UserView(ListView):
@@ -189,4 +204,32 @@ def projects(request, *args, **kwargs):
         points.save()
 
         return HttpResponseRedirect('/users/%s/projects/%s' % (point_args['user'], project))
+
+@api_view(('GET',))
+@renderer_classes((renderers.TemplateHTMLRenderer,renderers.JSONRenderer))
+def master_project_list(request):
+    queryset = Project.objects.all()
+
+    if request.accepted_renderer.format == 'html':
+        data = {'object_list': queryset}
+        return Response(data, template_name='core/projects.html')
+
+    # JSONRenderer
+    serializer = ProjectSerializer(instance=queryset)
+    data = serializer.data
+    return Response(data)
+
+
+@api_view(('GET',))
+@renderer_classes((renderers.TemplateHTMLRenderer,renderers.JSONRenderer))
+def user_points_list(request,username):
+    user = get_object_or_404(User, username=username)
+    queryset = badge_count(user)
+
+    if request.accepted_renderer.format == 'html':
+        data = {'profile': queryset}
+        return Response(data, template_name='core/points_list.html')
+
+    #JSON Renderer
+    return Response(queryset)
        

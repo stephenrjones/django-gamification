@@ -25,10 +25,7 @@
 
 from django.conf.urls import patterns, url, include
 from django.views.generic import CreateView, TemplateView, ListView, UpdateView
-from api import ProjectResource
-from views import PointsListView, UserProjectPointsView
-
-project_resource = ProjectResource()
+from views import PointsListView, UserProjectPointsView, MasterBadgeListView, user_points_list
 
 
 urlpatterns = patterns('',
@@ -38,8 +35,8 @@ urlpatterns = patterns('',
     url(r'^projects/(?P<projectname>\w+)/award/?$', 'gamification.core.views.award', name='award'),
     url(r'^projects/(?P<projectname>\w+)/?$', UserProjectPointsView.as_view(template_name='core/user_project_points_list.html'), name='user-project-points-list'),
     #url(r'^projects/(?P<projectname>\w+)/?$', 'gamification.core.views.projects', name='projects'),
-    #url(r'^projects/', include(project_resource.apis)),
 
     # POINTS
-    url(r'^points/?$', PointsListView.as_view(), name='points-list'),
+    #url(r'^points/?$', PointsListView.as_view(), name='points-list'),
+    url(r'^points/?$', user_points_list),
 )
