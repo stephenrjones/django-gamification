@@ -110,14 +110,14 @@ class Migration(SchemaMigration):
             'description': ('django.db.models.fields.TextField', [], {}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'project': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['core.Project']"}),
+            'project': ('django.db.models.fields.IntegerField', [], {}),
             'user': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'badges'", 'symmetrical': 'False', 'through': u"orm['badges.ProjectBadgeToUser']", 'to': u"orm['auth.User']"})
         },
         u'badges.projectbadgetouser': {
             'Meta': {'object_name': 'ProjectBadgeToUser'},
             'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'projectbadge': ('django.db.models.fields.IntegerField', [], {}),
+            'projectbadge': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['badges.ProjectBadge']"}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"})
         },
         u'contenttypes.contenttype': {
