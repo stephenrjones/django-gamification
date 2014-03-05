@@ -117,7 +117,7 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'ProjectBadgeToUser'},
             'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'projectbadge': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['badges.ProjectBadge']"}),
+            'projectbadge': ('django.db.models.fields.IntegerField', [], {}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"})
         },
         u'contenttypes.contenttype': {
