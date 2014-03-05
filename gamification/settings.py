@@ -147,6 +147,15 @@ TEMPLATE_DIRS = [
     os.path.join(PACKAGE_ROOT, "templates"),
 ]
 
+REST_FRAMEWORK = {
+    # hyperlinked styles by default
+    # only used if the 'serializer_class' attribute is not set on view
+    'DEFAULT_MODEL_SERIALIZER_CLASS': 'rest_framework.serializers.HyperlinkedModelSerializer',
+
+    # Use Django's standard 'django.contrib.auth' permissions, or read-only for unauthorized users
+    # 'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly']
+}
+
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -166,6 +175,7 @@ INSTALLED_APPS = [
     "eventlog",
     "bootstrap3",
     "south",
+    "rest_framework",
     
     # project
     "gamification",
