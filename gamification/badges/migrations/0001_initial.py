@@ -20,7 +20,7 @@ class Migration(SchemaMigration):
         # Adding model 'ProjectBadge'
         db.create_table(u'badges_projectbadge', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('project', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['core.Project'])),
+            ('project', self.gf('django.db.models.fields.IntegerField')()),
             ('badge', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['badges.Badge'])),
             ('name', self.gf('django.db.models.fields.CharField')(max_length=255)),
             ('description', self.gf('django.db.models.fields.TextField')()),
@@ -127,16 +127,6 @@ class Migration(SchemaMigration):
             'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
-        u'core.project': {
-            'Meta': {'ordering': "('-created_at',)", 'object_name': 'Project'},
-            'active': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'description': ('django.db.models.fields.TextField', [], {}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
-            'private': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'updated_at': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'})
-        }
     }
 
     complete_apps = ['badges']
