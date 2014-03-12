@@ -135,6 +135,7 @@ MIDDLEWARE_CLASSES = [
     "django.middleware.common.CommonMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
 ]
 
@@ -176,6 +177,7 @@ INSTALLED_APPS = [
     "bootstrap3",
     "south",
     "rest_framework",
+    "corsheaders",
     
     # project
     "gamification",
@@ -230,3 +232,6 @@ ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 2
 AUTHENTICATION_BACKENDS = [
     "account.auth_backends.UsernameAuthenticationBackend",
 ]
+
+CORS_ORIGIN_WHITELIST = ( '192.168.5.1', '192.168.5.128:8000' )
+CORS_ALLOW_METHODS = ( 'GET', 'POST', 'OPTIONS' )
