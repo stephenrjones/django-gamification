@@ -51,7 +51,7 @@ def badge_count(user_or_qs=None):
         
     return [get_badge_count(level_choice[0]) for level_choice in LEVEL_CHOICES]
         
-def project_badge_count(user, project, badge_choices):
+def project_badge_count(user, project, badge_choices, url):
     """
     Given a user or queryset of users, this returns the badge
     count at each badge level that the user(s) have earned.
@@ -67,18 +67,20 @@ def project_badge_count(user, project, badge_choices):
     badges = ProjectBadgeToUser.objects.all()
     badge_counts = badges.filter(user=user)
 
-    badge_counts = badge_counts.values('projectbadge__name','projectbadge__badge__icon')
+    badge_counts = badge_counts.values('projectbadge__name','projectbadge__badge__icon', 'projectbadge__badge__level').order_by('projectbadge__badge__level')
     badge_counts = badge_counts.annotate(count=models.Count('projectbadge__name'))
 
     def get_badge_count(badge):
         bc = [bc for bc in badge_counts if bc['projectbadge__name'] == badge.name]
         if bc:
+            # append url path for icon
+            bc[0]['projectbadge__badge__icon'] = url + bc[0]['projectbadge__badge__icon']
             return bc[0]
         else:
             # if the user has no badges at this level, return the appropriate response
-            return {'count': 0, 'projectbadge__name': badge.name, 'projectbadge__badge__icon': badge.badge.icon}
-                                        
-        
+            return {'count': 0, 'projectbadge__name': badge.name, 'projectbadge__badge__icon': url + badge.badge.icon.url,
+                        'level':badge.badge.level}
+
     return [get_badge_count(badge) for badge in badge_choices]
 
 class MetaBadgeMeta(type):
