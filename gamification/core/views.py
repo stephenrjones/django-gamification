@@ -28,6 +28,7 @@ from django.contrib.auth.models import User
 from django.views.generic import ListView
 from django.db.models import Sum
 from django.http import HttpResponseRedirect
+from django.conf import settings
 from models import Project, Points
 from gamification.badges.models import ProjectBadge, ProjectBadgeToUser
 from django.http import HttpResponse, HttpResponseRedirect, Http404
@@ -145,7 +146,7 @@ def award(request, *args, **kwargs):
             projectbadge = ProjectBadge.objects.get(pk=request.POST['award_id'])
             points = Points(user=user,projectbadge=projectbadge,value=request.POST['points'],description=request.POST['comment'])
             points.save()
-            return HttpResponseRedirect('/users/%s/projects/%s' % (kwargs['username'], kwargs['projectname']))
+            return HttpResponseRedirect('/users/%s/projects/%s/badges' % (kwargs['username'], kwargs['projectname']))
 
     else:
         form = AwardForm()
@@ -232,4 +233,45 @@ def user_points_list(request,username):
 
     #JSON Renderer
     return Response(queryset)
+
+
+@api_view(('GET',))
+@renderer_classes((renderers.TemplateHTMLRenderer,renderers.JSONRenderer))
+def user_project_points_list(request,username,projectname):
+    user = get_object_or_404(User, username=username)
+    project = get_object_or_404(Project, name=projectname)
+    totals = user_project_badge_count(user,project)
+
+    if request.accepted_renderer.format == 'html':
+        data = {'projectbadges': totals, 'username': user.username, 'projectname':project.description}
+        return Response(data, template_name='core/user_project_points_list.html')
+
+    #JSON Renderer
+    return Response(totals)
+
+@api_view(('GET',))
+@renderer_classes((renderers.TemplateHTMLRenderer,renderers.JSONRenderer))
+def user_project_badges_list(request,username,projectname):
+    user = get_object_or_404(User, username=username)
+    project = get_object_or_404(Project, name=projectname)
+    projbadges = ProjectBadge.objects.filter(project=project)
+    prefix = 'https://' if request.is_secure() else 'http://'
+    url = prefix + request.get_host() + settings.STATIC_URL
+
+    badges = project_badge_count(user,project,projbadges,url)
+
+    if request.accepted_renderer.format == 'html':
+        data = {'profile': badges}
+        return Response(data, template_name='core/badge_list.html')
+
+    #JSON
+    badge_detail_list = []
+
+    for bi in badges:
+        bstr = '{ "name":"%s", "awarded":%d, "url":"%s"}' % \
+            ( bi['projectbadge__name'], bi['count'], bi['projectbadge__badge__icon'])
+        badge_detail_list.append(json.loads(bstr))
+
+    return Response(badge_detail_list)
+
        
