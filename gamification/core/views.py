@@ -254,7 +254,7 @@ def user_project_points_list(request,username,projectname):
 def user_project_badges_list(request,username,projectname):
     user = get_object_or_404(User, username=username)
     project = get_object_or_404(Project, name=projectname)
-    projbadges = ProjectBadge.objects.filter(project=project)
+    projbadges = ProjectBadge.objects.filter(project=project).order_by('badge__level')
     prefix = 'https://' if request.is_secure() else 'http://'
     url = prefix + request.get_host() + settings.STATIC_URL
 
