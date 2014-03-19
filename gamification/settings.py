@@ -182,7 +182,8 @@ INSTALLED_APPS = [
     # project
     "gamification",
     "gamification.badges",
-    "gamification.core"
+    "gamification.core",
+    "gamification.events",
 ]
 
 # A sample logging configuration. The only tangible logging
