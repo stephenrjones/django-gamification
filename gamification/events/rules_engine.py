@@ -1,0 +1,58 @@
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, as long as
+# any reuse or further development of the software attributes the
+# National Geospatial-Intelligence Agency (NGA) authorship as follows:
+# 'This software (django-gamification)
+# is provided to the public as a courtesy of the National
+# Geospatial-Intelligence Agency.
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+# LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+# OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+# WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+from datetime import datetime # For testing purposes only
+from intellect.Intellect import Intellect
+from state import State
+
+class RulesEngine(object):
+    
+    def process_event(self, policy, user_id, project_id, event_data):
+        intellect = Intellect()
+        intellect.learn(policy)
+        intellect.learn(State(user_id, project_id, event_data))
+        intellect.reason()
+        
+    def run_test(self, policy, timestamp):
+        user_id = 'John Doe'
+        project_id = 'Mandatory Training'
+        event_type = 'course_complete'
+        event_data = {}
+        event_data[event_type] = training_event_data = {}
+    
+        course_ids = ['008031', '008189', '008582', '009446', '013413', '013567', '016003', '016094', '017724', '020146', '023416']
+
+        for cid in course_ids:
+            print ('Adding course {0}'.format(cid))
+            training_event_data[cid] = timestamp
+            self.process_event(policy, user_id, project_id, event_data)
+
+if __name__ == '__main__':
+    policy1 = "from state import State\nrule 'Rule 1':\n\twhen:\n\t\t$state := State((project_id == 'Mandatory Training') and ('course_complete' in event_data) and ('008031' in event_data['course_complete']) and ('008189' in event_data['course_complete']) and ('008582' in event_data['course_complete']) and ('009446' in event_data['course_complete']) and ('013413' in event_data['course_complete']) and ('013567' in event_data['course_complete']) and ('016003' in event_data['course_complete']) and ('016094' in event_data['course_complete']) and ('017724' in event_data['course_complete']) and ('020146' in event_data['course_complete']) and ('023416' in event_data['course_complete']))\n\tthen:\n\t\t$state.award_badge($state.user_id, $state.project_id, 'Gold')\n"
+    utilIntellect = Intellect()
+    policy2 = utilIntellect.local_file_uri('./test_data/mandatory_training_2.policy')
+    engine = RulesEngine()
+    engine.run_test(policy1, '')
+    engine.run_test(policy2, datetime.now())
+    engine.run_test(policy2, datetime(2015, 1, 1))
+    engine.run_test(policy2, datetime(2015, 2, 1))
