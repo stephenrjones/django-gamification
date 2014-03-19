@@ -23,23 +23,23 @@
 
 class State(object):
     
-    def __init__(self, user_id, project_id, event_data):
-        self._user_id = user_id
-        self._project_id = project_id
+    def __init__(self, username, projectname, event_data):
+        self._username = username
+        self._projectname = projectname
         self._event_data = event_data # A dictionary (with event type as key) of dictionaries
     
     @property
-    def user_id(self):
-        return self._user_id
+    def username(self):
+        return self._username
     
     @property
-    def project_id(self):
-        return self._project_id
+    def projectname(self):
+        return self._projectname
     
     @property
     def event_data(self):
         return self._event_data
         
-    def award_badge(self, user_id, project_id, badge_id):
+    def award_badge(self, username, projectname, badge_id):
         #TODO: Update database with badge info instead
-        print ('\n{0} awarded {1} badge for {2}'.format(user_id, badge_id, project_id))
+        print ('\n{0} awarded {1} badge for {2}'.format(username, badge_id, projectname))
