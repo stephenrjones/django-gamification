@@ -34,7 +34,7 @@ admin.autodiscover()
 from gamification.core.models import Project
 from gamification.core.views import MasterProjectListView, ProjectListView, UserProjectPointsView, BadgeListView, UserView, \
                                     MasterBadgeListView, master_project_list
-
+from gamification.events.views import handle_event
 
 urlpatterns = patterns("",
     url(r"^gamification/$", TemplateView.as_view(template_name="core/index.html"), name="home"),
@@ -47,6 +47,7 @@ urlpatterns = patterns("",
     url(r"^projects/(?P<projectname>\w+)/?$", ProjectListView.as_view(template_name='core/projects_list.html'), name='project-list'),
     url(r"^projects/(?P<projectname>\w+)/badges/?$", BadgeListView.as_view(template_name='core/badge_list.html'), name='badge-list'),
     url(r'^badges/?$', MasterBadgeListView.as_view(template_name='core/master_badge_list.html'), name='master-badge-list'),
+    url(r'^users/(?P<username>\w+)/projects/(?P<projectname>\w+)/event/$', handle_event)
 )
 
 # urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
