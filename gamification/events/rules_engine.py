@@ -27,15 +27,15 @@ from state import State
 
 class RulesEngine(object):
     
-    def process_event(self, policy, username, projectname, event_data):
+    def reason(self, policy, state):
         intellect = Intellect()
         intellect.learn(policy)
-        intellect.learn(State(username, projectname, event_data))
+        intellect.learn(state)
         intellect.reason()
         
     def run_test(self, policy, event_dtg):
-        username = 'John Doe'
-        projectname = 'Mandatory Training'
+        username = 'admin'
+        projectname = 'training'
         event_type = 'course_complete'
         event_data = {}
         event_data[event_type] = training_event_data = {}
@@ -45,10 +45,18 @@ class RulesEngine(object):
         for cid in course_ids:
             print ('Adding course {0}'.format(cid))
             training_event_data[cid] = event_dtg
-            self.process_event(policy, username, projectname, event_data)
+            
+            class Object(object):
+                pass
+            user = Object()
+            user.username = username
+            project = Object()
+            project.name = projectname
+            
+            self.reason(policy, State(user, project, event_data))
 
 if __name__ == '__main__':
-    policy1 = "from state import State\nrule 'Rule 1':\n\twhen:\n\t\t$state := State((projectname == 'Mandatory Training') and ('course_complete' in event_data) and ('008031' in event_data['course_complete']) and ('008189' in event_data['course_complete']) and ('008582' in event_data['course_complete']) and ('009446' in event_data['course_complete']) and ('013413' in event_data['course_complete']) and ('013567' in event_data['course_complete']) and ('016003' in event_data['course_complete']) and ('016094' in event_data['course_complete']) and ('017724' in event_data['course_complete']) and ('020146' in event_data['course_complete']) and ('023416' in event_data['course_complete']))\n\tthen:\n\t\t$state.award_badge($state.username, $state.projectname, 'Gold')\n"
+    policy1 = "from state import State\nrule 'Rule 1':\n\twhen:\n\t\t$state := State((project.name == 'training') and ('course_complete' in event_data) and ('008031' in event_data['course_complete']) and ('008189' in event_data['course_complete']) and ('008582' in event_data['course_complete']) and ('009446' in event_data['course_complete']) and ('013413' in event_data['course_complete']) and ('013567' in event_data['course_complete']) and ('016003' in event_data['course_complete']) and ('016094' in event_data['course_complete']) and ('017724' in event_data['course_complete']) and ('020146' in event_data['course_complete']) and ('023416' in event_data['course_complete']))\n\tthen:\n\t\t$state.award_badge($state.user, $state.project, 'Gold')\n"
     utilIntellect = Intellect()
     policy2 = utilIntellect.local_file_uri('./test_data/mandatory_training_2.policy')
     engine = RulesEngine()
