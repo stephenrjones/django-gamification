@@ -25,6 +25,8 @@ from datetime import datetime # For testing purposes only
 from intellect.Intellect import Intellect
 from state import State
 
+# Experimental class that was used for early rules engine testing purposes
+
 class RulesEngine(object):
     
     def reason(self, policy, state):
