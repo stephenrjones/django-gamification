@@ -83,15 +83,19 @@ def handle_event(request, *args, **kwargs):
         event.save()
        
         #####################################################################
-        # Training demo  policies
+        # 'Training' demo policies. Assumes there is a 'training' project with badge id 1. Badge awarded when all courses finished.
+        # Sample curl command for sending event for user 'admin': 
+        # curl -d "details={\"event_type\":\"course_complete\",\"course_id\":\"008031\"}" http://localhost:8000/users/admin/projects/training/event/
         #state_policy = "from gamification.events.models import Event\nrule 'Rule 1':\n\twhen:\n\t\t$event := Event(('event_type' in details_map) and ('course_complete' in details_map['event_type']) and ('course_id' in details_map))\n\tthen:\n\t\t$event.update_state('course_complete', $event.details_map['course_id'], $event.event_dtg)\n"
         #award_policy = "from gamification.events.state import State\nrule 'Rule 1':\n\twhen:\n\t\t$state := State((project.name == 'training') and ('course_complete' in event_data) and ('008031' in event_data['course_complete']) and ('008189' in event_data['course_complete']) and ('008582' in event_data['course_complete']) and ('009446' in event_data['course_complete']) and ('013413' in event_data['course_complete']) and ('013567' in event_data['course_complete']) and ('016003' in event_data['course_complete']) and ('016094' in event_data['course_complete']) and ('017724' in event_data['course_complete']) and ('020146' in event_data['course_complete']) and ('023416' in event_data['course_complete']))\n\tthen:\n\t\t$state.award($state.user, $state.project, 1)\n"
         #####################################################################
 
         #####################################################################
-        # AOI demo  policies
+        # 'GeoQ AOI' demo policies. Assumes there is a 'geoq' project with badge id 4. Badge awarded when at least three AOIs are completed.
+        # Sample curl command for sending event for user 'admin':
+        # curl -d "details={\"event_type\":\"aoi_complete\",\"aoi_id\":\"2\"}" http://localhost:8000/users/admin/projects/geoq/event/
         state_policy = "from gamification.events.models import Event\nrule 'Rule 1':\n\twhen:\n\t\t$event := Event(('event_type' in details_map) and ('aoi_complete' in details_map['event_type']) and ('aoi_id' in details_map))\n\tthen:\n\t\t$event.update_state('aoi_complete', $event.details_map['aoi_id'], $event.event_dtg)\n"
-        award_policy = "from gamification.events.state import State\nrule 'Rule 1':\n\twhen:\n\t\t$state := State((project.name == 'geoq') and ('aoi_complete' in event_data) and (len(event_data['aoi_complete']) == 3))\n\tthen:\n\t\t$state.award($state.user, $state.project, 4)\n"
+        award_policy = "from gamification.events.state import State\nrule 'Rule 1':\n\twhen:\n\t\t$state := State((project.name == 'geoq') and ('aoi_complete' in event_data) and (len(event_data['aoi_complete']) >= 3))\n\tthen:\n\t\t$state.award($state.user, $state.project, 4)\n"
         #####################################################################
 
         # Build state
