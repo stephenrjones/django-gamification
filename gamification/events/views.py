@@ -42,7 +42,7 @@ def handle_event(request, *args, **kwargs):
             user = User.objects.get(username=username)
         except ObjectDoesNotExist:
             return HttpResponse('User not found', status=404)
-        print('handle_event found username {0}').format(username)
+        #print('handle_event found username {0}').format(username)
         
         # Get event project
         projectname=kwargs['projectname']
@@ -50,7 +50,7 @@ def handle_event(request, *args, **kwargs):
             project = Project.objects.get(name=projectname)
         except ObjectDoesNotExist:
             return HttpResponse('Project not found', status=404)
-        print('handle_event found projectname {0}').format(projectname)
+        #print('handle_event found projectname {0}').format(projectname)
         
         # Get event DTG
         try:
@@ -61,20 +61,20 @@ def handle_event(request, *args, **kwargs):
                 return HttpResponse('Invalid event_dtg', status=400)      
         except MultiValueDictKeyError:
             event_dtg = timezone.now()
-        print('handle_event got event_dtg {0}').format(datetime.strftime(event_dtg, '%Y-%m-%dT%H:%M:%S%Z'))
+        #print('handle_event got event_dtg {0}').format(datetime.strftime(event_dtg, '%Y-%m-%dT%H:%M:%S%Z'))
         
         # Get event details
         try:
             details = request.POST['details']
         except MultiValueDictKeyError:
             details = None
-        print('handle_event got details {0}').format(details)
+        #print('handle_event got details {0}').format(details)
         
         # Create Event object
         try:
             event = Event(user=user, project=project, event_dtg=event_dtg, details=details)
         except ValueError, ve:
-            print('handle_event failed create event: {0}').format(ve)
+            #print('handle_event failed create event: {0}').format(ve)
             return HttpResponse('Invalid event', status=400) # If, for example, 'details' JSON does not load   
         
         # Save Event object
