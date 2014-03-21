@@ -40,6 +40,6 @@ class State(object):
     def event_data(self):
         return self._event_data
         
-    def award_badge(self, user, project, badge_id):
+    def award(self, user, project, award_id):
         #TODO: Update database with badge info instead
-        print ('\n{0} awarded {1} badge for {2}'.format(user.username, badge_id, project.name))
+        print ('\n{0} received {1} award for {2}'.format(user.username, award_id, project.name))

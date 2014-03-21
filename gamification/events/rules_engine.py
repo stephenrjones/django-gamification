@@ -56,7 +56,7 @@ class RulesEngine(object):
             self.reason(policy, State(user, project, event_data))
 
 if __name__ == '__main__':
-    policy1 = "from state import State\nrule 'Rule 1':\n\twhen:\n\t\t$state := State((project.name == 'training') and ('course_complete' in event_data) and ('008031' in event_data['course_complete']) and ('008189' in event_data['course_complete']) and ('008582' in event_data['course_complete']) and ('009446' in event_data['course_complete']) and ('013413' in event_data['course_complete']) and ('013567' in event_data['course_complete']) and ('016003' in event_data['course_complete']) and ('016094' in event_data['course_complete']) and ('017724' in event_data['course_complete']) and ('020146' in event_data['course_complete']) and ('023416' in event_data['course_complete']))\n\tthen:\n\t\t$state.award_badge($state.user, $state.project, 'Gold')\n"
+    policy1 = "from state import State\nrule 'Rule 1':\n\twhen:\n\t\t$state := State((project.name == 'training') and ('course_complete' in event_data) and ('008031' in event_data['course_complete']) and ('008189' in event_data['course_complete']) and ('008582' in event_data['course_complete']) and ('009446' in event_data['course_complete']) and ('013413' in event_data['course_complete']) and ('013567' in event_data['course_complete']) and ('016003' in event_data['course_complete']) and ('016094' in event_data['course_complete']) and ('017724' in event_data['course_complete']) and ('020146' in event_data['course_complete']) and ('023416' in event_data['course_complete']))\n\tthen:\n\t\t$state.award($state.user, $state.project, 'Gold')\n"
     utilIntellect = Intellect()
     policy2 = utilIntellect.local_file_uri('./test_data/mandatory_training_2.policy')
     engine = RulesEngine()
