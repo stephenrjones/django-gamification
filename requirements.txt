@@ -26,3 +26,4 @@ pytz==2012j
 requests==1.2.3
 six==1.4.1
 wsgiref==0.1.2
+Intellect==1.4.9
