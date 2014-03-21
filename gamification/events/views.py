@@ -21,8 +21,86 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+from dateutil.parser import parse
+from datetime import datetime
 from django.http import HttpResponse
+from django.contrib.auth.models import User
+from django.utils import timezone
+from django.utils.datastructures import MultiValueDictKeyError
+from django.core.exceptions import ObjectDoesNotExist
+from gamification.core.models import Project
+from gamification.events.models import Event
+from gamification.events.state import State
+from intellect.Intellect import Intellect
 
 def handle_event(request, *args, **kwargs):
     if request.method == 'POST':
+        
+        # Get event user
+        username=kwargs['username']
+        try:
+            user = User.objects.get(username=username)
+        except ObjectDoesNotExist:
+            return HttpResponse('User not found', status=404)
+        print('handle_event found username {0}').format(username)
+        
+        # Get event project
+        projectname=kwargs['projectname']
+        try:
+            project = Project.objects.get(name=projectname)
+        except ObjectDoesNotExist:
+            return HttpResponse('Project not found', status=404)
+        print('handle_event found projectname {0}').format(projectname)
+        
+        # Get event DTG
+        try:
+            event_dtg_str = request.POST['event_dtg']
+            try:
+                event_dtg = parse(event_dtg_str)
+            except ValueError:
+                return HttpResponse('Invalid event_dtg', status=400)      
+        except MultiValueDictKeyError:
+            event_dtg = timezone.now()
+        print('handle_event got event_dtg {0}').format(datetime.strftime(event_dtg, '%Y-%m-%dT%H:%M:%S%Z'))
+        
+        # Get event details
+        try:
+            details = request.POST['details']
+        except MultiValueDictKeyError:
+            details = None
+        print('handle_event got details {0}').format(details)
+        
+        # Create Event object
+        try:
+            event = Event(user=user, project=project, event_dtg=event_dtg, details=details)
+        except ValueError, ve:
+            print('handle_event failed create event: {0}').format(ve)
+            return HttpResponse('Invalid event', status=400) # If, for example, 'details' JSON does not load   
+        
+        # Save Event object
+        event.save()
+       
+        #####################################################################
+        # Demo  policies
+        state_policy = "from gamification.events.models import Event\nrule 'Rule 1':\n\twhen:\n\t\t$event := Event(('event_type' in details_map) and ('course_complete' in details_map['event_type']) and ('course_id' in details_map))\n\tthen:\n\t\t$event.update_state('course_complete', $event.details_map['course_id'], $event.event_dtg)\n"
+        award_policy = "from gamification.events.state import State\nrule 'Rule 1':\n\twhen:\n\t\t$state := State((project.name == 'training') and ('course_complete' in event_data) and ('008031' in event_data['course_complete']) and ('008189' in event_data['course_complete']) and ('008582' in event_data['course_complete']) and ('009446' in event_data['course_complete']) and ('013413' in event_data['course_complete']) and ('013567' in event_data['course_complete']) and ('016003' in event_data['course_complete']) and ('016094' in event_data['course_complete']) and ('017724' in event_data['course_complete']) and ('020146' in event_data['course_complete']) and ('023416' in event_data['course_complete']))\n\tthen:\n\t\t$state.award($state.user, $state.project, 1)\n"
+        #####################################################################
+
+        # Build state
+        intellect = Intellect()
+        intellect.learn(state_policy)
+        events = Event.objects.filter(user=user, project=project)
+        event_data = {}
+        state = State(user, project, event_data)
+        for e in events:
+            e.state = state
+            intellect.learn(e)
+        intellect.reason()
+              
+        # Apply award policy       
+        intellect = Intellect()
+        intellect.learn(award_policy)
+        intellect.learn(state)
+        intellect.reason()
+      
         return HttpResponse(status=200)

@@ -21,12 +21,19 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+from django.core.exceptions import ObjectDoesNotExist
+from gamification.badges.models import ProjectBadge, ProjectBadgeToUser
+
 class State(object):
+    """
+    A State is a collection of event data (associated with a user and project)
+    that will be submitted to the rules engine for reasoning.
+    """
     
     def __init__(self, user, project, event_data):
         self._user = user
         self._project = project
-        self._event_data = event_data # A dictionary (with event type as key) of dictionaries
+        self._event_data = event_data # A dictionary of dictionaries
     
     @property
     def user(self):
@@ -39,7 +46,15 @@ class State(object):
     @property
     def event_data(self):
         return self._event_data
+    
+    @event_data.setter
+    def event_data(self, event_data):
+        self._event_data = event_data
         
+    # Awards a project badge to a user (if the user does not yet have the badge)    
     def award(self, user, project, award_id):
-        #TODO: Update database with badge info instead
-        print ('\n{0} received {1} award for {2}'.format(user.username, award_id, project.name))
+        project_badge = ProjectBadge.objects.get(pk=award_id)
+        try:
+            ProjectBadgeToUser.objects.get(projectbadge=project_badge, user=user)
+        except ObjectDoesNotExist:
+            project_badge.award_to(user)

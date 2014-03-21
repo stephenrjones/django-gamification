@@ -28,7 +28,6 @@ from django.contrib.auth.models import User
 from gamification.core.models import Project
 from django.db import models
 
-
 class Event(models.Model):
     """
     An Event is an action reported by an external system
@@ -42,14 +41,35 @@ class Event(models.Model):
     def __init__(self, *args, **kw):
         # dictionary for the details of the event
         self.details_map = {}
-        super(Event, self).__init__(*args,**kw)
+        super(Event, self).__init__(*args, **kw)
         if self.details:
             self.details_map = json.loads(self.details)
 
     def save(self, *args, **kw):
         self.details = json.dumps(self.details_map)
-        super(Event, self).save(*args,**kw)
+        super(Event, self).save(*args, **kw)
 
-
-
-
+    @property
+    def details_map(self):
+        return self._details_map
+    
+    @details_map.setter
+    def details_map(self, details_map):
+        self._details_map = details_map
+        
+    @property
+    def state(self):
+        return self._state
+    
+    @state.setter
+    def state(self, state):
+        self._state = state
+    
+    # Adds specified event data to the state    
+    def update_state(self, outer_key, inner_key, inner_value):
+        try:
+            if not outer_key in self._state.event_data:
+                self._state._event_data[outer_key] = {}
+            self._state._event_data[outer_key][inner_key] = inner_value 
+        except AttributeError:
+            pass
