@@ -25,7 +25,7 @@
 
 import json
 from django.contrib.auth.models import User
-from gamification.core.models import Project
+from gamification.core.models import Project, ProjectBadge
 from django.db import models
 
 class Event(models.Model):
@@ -43,7 +43,10 @@ class Event(models.Model):
         self.details_map = {}
         super(Event, self).__init__(*args, **kw)
         if self.details:
-            self.details_map = json.loads(self.details)
+            try:
+                self.details_map = json.loads(self.details)
+            except TypeError:
+                self.details_map = self.details
 
     def save(self, *args, **kw):
         self.details = json.dumps(self.details_map)
@@ -73,3 +76,38 @@ class Event(models.Model):
             self._state._event_data[outer_key][inner_key] = inner_value 
         except AttributeError:
             pass
+
+class Policy(models.Model):
+    """
+    A Policy is a condition - action specifier for the rules engine. Will include 1 or more Rules
+    """
+
+    STATE_POLICY = 0
+    AWARD_POLICY = 1
+    POLICY_CHOICES = ( (STATE_POLICY, 'State Policy'), (AWARD_POLICY, 'Award Policy') )
+
+    project = models.ForeignKey(Project)
+    name = models.CharField(max_length=100)
+    type = models.IntegerField(choices=POLICY_CHOICES)
+
+
+class Rule(models.Model):
+    """
+    A Rule is a decision specifier that will be the basis for a Policy
+    """
+
+    name = models.CharField(max_length=100)
+    policy = models.ForeignKey(Policy)
+    badge = models.ForeignKey(ProjectBadge)
+    conditions = models.TextField(editable=False)
+
+    def __init__(self, *args, **kw):
+        # dictionary for the details of the event
+        self.conditions_list = []
+        super(Event, self).__init__(*args, **kw)
+        if self.conditions:
+            self.conditions_list = json.loads(self.conditions)
+
+    def save(self, *args, **kw):
+        self.conditions = json.dumps(self.conditions_list)
+        super(Event, self).save(*args, **kw)
