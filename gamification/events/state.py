@@ -30,9 +30,10 @@ class State(object):
     that will be submitted to the rules engine for reasoning.
     """
     
-    def __init__(self, user, project, event_data):
+    def __init__(self, user, project, projectbadge, event_data):
         self._user = user
         self._project = project
+        self._projectbadge = projectbadge
         self._event_data = event_data # A dictionary of dictionaries
     
     @property
@@ -52,11 +53,6 @@ class State(object):
         self._event_data = event_data
         
     # Awards a project badge to a user (if the user does not yet have the badge)    
-    def award(self, user, project, award_id):
-        project_badge = ProjectBadge.objects.get(pk=award_id)
-        count = ProjectBadgeToUser.objects.filter(user=user, projectbadge=project_badge).count()
-        try:
-            # ProjectBadgeToUser.objects.get(projectbadge=project_badge, user=user)
-            project_badge.award_to(user)
-        except ObjectDoesNotExist:
-            project_badge.award_to(user)
+    def award(self, user, project):
+        project_badge = self._projectbadge
+        project_badge.award_to(user)
