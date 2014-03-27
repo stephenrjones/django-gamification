@@ -25,38 +25,45 @@ from dateutil.parser import parse
 from django.http import HttpResponse
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.shortcuts import get_object_or_404
 from django.utils.datastructures import MultiValueDictKeyError
 from django.core.exceptions import ObjectDoesNotExist
 from gamification.core.models import Project
 from gamification.events.models import Event
 from gamification.events.state import State
 from intellect.Intellect import Intellect
+import json
 
 # For debug
 from datetime import datetime
 
 def handle_event(request, *args, **kwargs):
     if request.method == 'POST':
+
+        data = json.loads(request.body)
+        # data = request.POST
         
         # Get event user
-        username=kwargs['username']
-        try:
-            user = User.objects.get(username=username)
-        except ObjectDoesNotExist:
-            return HttpResponse('User not found', status=404)
+        #username=kwargs['username']
+        #try:
+        #    user = User.objects.get(username=username)
+        #except ObjectDoesNotExist:
+        #    return HttpResponse('User not found', status=404)
         #print('handle_event found username {0}').format(username)
+        user = get_object_or_404(User,username=kwargs['username'])
         
         # Get event project
-        projectname=kwargs['projectname']
-        try:
-            project = Project.objects.get(name=projectname)
-        except ObjectDoesNotExist:
-            return HttpResponse('Project not found', status=404)
+        #projectname=kwargs['projectname']
+        #try:
+        #    project = Project.objects.get(name=projectname)
+        #except ObjectDoesNotExist:
+        #    return HttpResponse('Project not found', status=404)
         #print('handle_event found projectname {0}').format(projectname)
+        project = get_object_or_404(Project,name=kwargs['projectname'])
         
         # Get event DTG
         try:
-            event_dtg_str = request.POST['event_dtg']
+            event_dtg_str = data['event_dtg']
             try:
                 event_dtg = parse(event_dtg_str)
             except ValueError:
@@ -67,7 +74,7 @@ def handle_event(request, *args, **kwargs):
         
         # Get event details
         try:
-            details = request.POST['details']
+            details = data['details']
         except MultiValueDictKeyError:
             details = None
         #print('handle_event got details {0}').format(details)
@@ -81,6 +88,7 @@ def handle_event(request, *args, **kwargs):
         
         # Save Event object
         event.save()
+        current_aoi = details['aoi_id']
        
         #####################################################################
         # 'Training' demo policies. Assumes there is a 'training' project with badge id 1. Badge awarded when all courses finished.
@@ -94,25 +102,34 @@ def handle_event(request, *args, **kwargs):
         # 'GeoQ AOI' demo policies. Assumes there is a 'geoq' project with badge id 4. Badge awarded when at least three AOIs are completed.
         # Sample curl command for sending event for user 'admin':
         # curl -d "details={\"event_type\":\"aoi_complete\",\"aoi_id\":\"2\"}" http://localhost:8000/users/admin/projects/geoq/event/
-        state_policy = "from gamification.events.models import Event\nrule 'Rule 1':\n\twhen:\n\t\t$event := Event(('event_type' in details_map) and ('aoi_complete' in details_map['event_type']) and ('aoi_id' in details_map))\n\tthen:\n\t\t$event.update_state('aoi_complete', $event.details_map['aoi_id'], $event.event_dtg)\n"
-        award_policy = "from gamification.events.state import State\nrule 'Rule 1':\n\twhen:\n\t\t$state := State((project.name == 'geoq') and ('aoi_complete' in event_data) and (len(event_data['aoi_complete']) >= 3))\n\tthen:\n\t\t$state.award($state.user, $state.project, 4)\n"
+        bronze_state_policy = "from gamification.events.models import Event\nrule 'Rule 1':\n\twhen:\n\t\t$event := Event((" + str(current_aoi) + " == details_map['aoi_id']) and ( details_map['feature_count'] > 0))\n\tthen:\n\t\t$event.update_state('aoi_complete', $event.details_map['aoi_id'], $event.event_dtg)\n"
+        bronze_award_policy = "from gamification.events.state import State\nrule 'Rule 1':\n\twhen:\n\t\t$state := State((project.name == 'django_geoq') and ('aoi_complete' in event_data) and (len(event_data['aoi_complete']) > 0))\n\tthen:\n\t\t$state.award($state.user, $state.project, 6)\n"
+        silver_state_policy = "from gamification.events.models import Event\nrule 'Rule 1':\n\twhen:\n\t\t$event := Event(('event_type' in details_map) and ('aoi_complete' in details_map['event_type']) and ('aoi_id' in details_map) and ( details_map['feature_count'] > 0))\n\tthen:\n\t\t$event.update_state('aoi_complete', $event.details_map['aoi_id'], $event.event_dtg)\n"
+        silver_award_policy = "from gamification.events.state import State\nrule 'Rule 1':\n\twhen:\n\t\t$state := State((project.name == 'django_geoq') and ('aoi_complete' in event_data) and (len(event_data['aoi_complete']) % 3 == 0) and (" + str(current_aoi) + " in event_data['aoi_complete']))\n\tthen:\n\t\t$state.award($state.user, $state.project, 5)\n"
+
+        policies = [[bronze_state_policy, bronze_award_policy], [silver_state_policy, silver_award_policy]]
+
         #####################################################################
 
-        # Build state
-        intellect = Intellect()
-        intellect.learn(state_policy)
-        events = Event.objects.filter(user=user, project=project)
-        event_data = {}
-        state = State(user, project, event_data)
-        for e in events:
-            e.state = state
-            intellect.learn(e)
-        intellect.reason()
+        for policy_list in policies:
+            state_policy = policy_list[0]
+            award_policy = policy_list[1]
+
+            # Build state
+            intellect = Intellect()
+            intellect.learn(state_policy)
+            events = Event.objects.filter(user=user, project=project)
+            event_data = {}
+            state = State(user, project, event_data)
+            for e in events:
+                e.state = state
+                intellect.learn(e)
+            intellect.reason()
               
-        # Apply award policy       
-        intellect = Intellect()
-        intellect.learn(award_policy)
-        intellect.learn(state)
-        intellect.reason()
+            # Apply award policy
+            intellect = Intellect()
+            intellect.learn(award_policy)
+            intellect.learn(state)
+            intellect.reason()
       
         return HttpResponse(status=200)
