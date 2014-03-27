@@ -4,6 +4,7 @@ from django.db import models
 from django.contrib.auth.models import User
 
 from models import Points, Project, ProjectBadge
+from gamification.badges.models import ProjectBadgeToUser
 
 def badge_count(user):
     """
@@ -41,9 +42,9 @@ def badge_count(user):
     return projects
 
 
-def top_n_badge_winners(projects, n):
+def top_n_points_winners(projects, n):
     """
-    Given a particular project, this returns the top n badge
+    Given a particular project, this returns the top n points
     winners at each badge level.
 
     Example:
@@ -68,7 +69,7 @@ def top_n_badge_winners(projects, n):
 
     return projects
 
-def top_n_badge_winners(projects, n):
+def top_n_badge_winners(project, num):
     """
     Given a particular project, this returns the top n badge
     winners at each badge level.
@@ -79,22 +80,32 @@ def top_n_badge_winners(projects, n):
      [{'count': 0, 'badge__level': '1'}, {'count': 0, 'badge__level': '2'}, {'count': 0, 'badge__level': '3'}, {'count': 0, 'badge__level': '4'}]
 
     """
-    points = Points.objects.all()
-    projects = projects.values('id','active','description','private')
-    projects = list(projects)
+    projectbadges = ProjectBadge.objects.filter(project=project)
+    ids = projectbadges.values('id')
+    badges = projectbadges.values('id','name','description')
 
-    for project in projects:
-        projectbadges = ProjectBadge.objects.filter(project_id=project['id']).values('id','description')
-        projectbadges = list(projectbadges)
+    pbtu = ProjectBadgeToUser.objects.filter(projectbadge__in=ids)
+    badges = list(badges)
 
-        for badge in projectbadges:
-            badge_points_winners = points.filter(projectbadge_id=badge['id']).select_related('user__username').values('user_id','user__username').annotate(points_count=models.Sum('value')).order_by('-points_count')[:n]
-            badge['winners'] = badge_points_winners
+    for badge in badges:
+        badge['leaders'] = top_n_badge_project_winners(pbtu,badge['id'],num)
+        del badge['id']
 
-        project['badges'] = projectbadges
+    return badges
 
-    return projects
+def top_n_project_badge_winners(project,badge,num):
+    """
+    Given a particular project and badge, determine top n leaders
+    """
 
+    pbtu = ProjectBadgeToUser.objects.filter(projectbadge=badge)
+    badge.leaders = top_n_badge_project_winners(pbtu, badge.id, num)
+
+    return badge
+
+def top_n_badge_project_winners(pbtu_qs,pb_id,num):
+    topn = pbtu_qs.filter(projectbadge__id=pb_id).values('user__username').annotate(awarded=models.Count('user__username')).order_by('-awarded')[:num]
+    return list(topn)
 
 def user_project_badge_count(user,project):
     """
