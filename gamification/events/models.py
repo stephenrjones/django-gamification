@@ -67,7 +67,15 @@ class Event(models.Model):
     @state.setter
     def state(self, state):
         self._state = state
-    
+
+    @property
+    def is_current_event(self):
+        return self._current_event
+
+    @state.setter
+    def current_event(self, current_event_id):
+        self._current_event = (self.id == current_event_id)
+
     # Adds specified event data to the state    
     def update_state(self, outer_key, inner_key, inner_value):
         try:
@@ -87,27 +95,31 @@ class Policy(models.Model):
     POLICY_CHOICES = ( (STATE_POLICY, 'State Policy'), (AWARD_POLICY, 'Award Policy') )
 
     project = models.ForeignKey(Project)
-    name = models.CharField(max_length=100)
+    projectbadge = models.ForeignKey(ProjectBadge)
     type = models.IntegerField(choices=POLICY_CHOICES)
+    rule = models.TextField()
+
+    def __unicode__(self):
+        return u"%s for %s on %s" % (self.POLICY_CHOICES[type][1],projectbadge.name,project.name)
 
 
-class Rule(models.Model):
-    """
-    A Rule is a decision specifier that will be the basis for a Policy
-    """
-
-    name = models.CharField(max_length=100)
-    policy = models.ForeignKey(Policy)
-    badge = models.ForeignKey(ProjectBadge)
-    conditions = models.TextField(editable=False)
-
-    def __init__(self, *args, **kw):
-        # dictionary for the details of the event
-        self.conditions_list = []
-        super(Event, self).__init__(*args, **kw)
-        if self.conditions:
-            self.conditions_list = json.loads(self.conditions)
-
-    def save(self, *args, **kw):
-        self.conditions = json.dumps(self.conditions_list)
-        super(Event, self).save(*args, **kw)
+#class Rule(models.Model):
+#    """
+#    A Rule is a decision specifier that will be the basis for a Policy
+#    """
+#
+#    name = models.CharField(max_length=100)
+#    policy = models.ForeignKey(Policy)
+#    badge = models.ForeignKey(ProjectBadge)
+#    conditions = models.TextField(editable=False)
+#
+#    def __init__(self, *args, **kw):
+#        # dictionary for the details of the event
+#        self.conditions_list = []
+#        super(Event, self).__init__(*args, **kw)
+#        if self.conditions:
+#            self.conditions_list = json.loads(self.conditions)
+#
+#    def save(self, *args, **kw):
+#        self.conditions = json.dumps(self.conditions_list)
+#        super(Event, self).save(*args, **kw)
