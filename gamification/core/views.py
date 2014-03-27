@@ -29,13 +29,14 @@ from django.views.generic import ListView
 from django.db.models import Sum
 from django.http import HttpResponseRedirect
 from django.conf import settings
+from django.utils.datastructures import SortedDict
 from models import Project, Points
 from gamification.badges.models import ProjectBadge, ProjectBadgeToUser
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render, get_object_or_404
 import json
 from gamification.badges.utils import project_badge_count
-from gamification.core.utils import badge_count,top_n_badge_winners,user_project_badge_count
+from gamification.core.utils import badge_count,top_n_badge_winners,user_project_badge_count, top_n_project_badge_winners
 from gamification.core.models import Project
 from gamification.core.forms import AwardForm
 from gamification.core.serializers import ProjectSerializer, PointsSerializer
@@ -273,5 +274,61 @@ def user_project_badges_list(request,username,projectname):
         badge_detail_list.append(json.loads(bstr))
 
     return Response(badge_detail_list)
+
+
+@api_view(('GET',))
+@renderer_classes((renderers.TemplateHTMLRenderer,renderers.JSONRenderer))
+def project_all_badgeleaders_view(request,projectname):
+    project = get_object_or_404(Project, name=projectname)
+
+    try:
+        count = int(request.QUERY_PARAMS['count'])
+    except Exception:
+        count = 10
+
+    project_leaders = top_n_badge_winners(project,count)
+
+    if request.accepted_renderer.format == 'html':
+        return Response(data, template_name='core/user_project_points_list.html')
+
+    #JSON Renderer
+    return Response(project_leaders)
+
+@api_view(('GET',))
+@renderer_classes((renderers.TemplateHTMLRenderer,renderers.JSONRenderer))
+def project_badgeleaders_view(request,projectname,badgename):
+    project = get_object_or_404(Project, name=projectname)
+    badge = get_object_or_404(ProjectBadge, name=badgename)
+
+    try:
+        count = int(request.QUERY_PARAMS['count'])
+    except Exception:
+        count = 10
+
+    badge_leaders = top_n_project_badge_winners(project,badge,count)
+    d = SortedDict()
+    d["name"] = badge_leaders.name
+    d["description"] = badge_leaders.description
+    d["leaders"] = badge_leaders.leaders
+
+    if request.accepted_renderer.format == 'html':
+        return Response(data, template_name='core/user_project_points_list.html')
+
+    #JSON Renderer
+
+    return Response(d)
+
+@api_view(('POST',))
+def create_new_user(request, *args, **kwargs):
+    username = kwargs['username'].lower()
+    ucount = User.objects.filter(username=username).count()
+    if ucount > 0:
+        return HttpResponse("User already exists", 400)
+
+    user = User.objects.create_user(username=username)
+    user.save()
+    return HttpResponse("User Created")
+
+
 
        
