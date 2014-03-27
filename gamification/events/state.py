@@ -54,7 +54,9 @@ class State(object):
     # Awards a project badge to a user (if the user does not yet have the badge)    
     def award(self, user, project, award_id):
         project_badge = ProjectBadge.objects.get(pk=award_id)
+        count = ProjectBadgeToUser.objects.filter(user=user, projectbadge=project_badge).count()
         try:
-            ProjectBadgeToUser.objects.get(projectbadge=project_badge, user=user)
+            # ProjectBadgeToUser.objects.get(projectbadge=project_badge, user=user)
+            project_badge.award_to(user)
         except ObjectDoesNotExist:
             project_badge.award_to(user)
