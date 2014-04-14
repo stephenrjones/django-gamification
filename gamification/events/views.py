@@ -119,7 +119,6 @@ def handle_event(request, *args, **kwargs):
                     print 'state policy not found'
 
                 try:
-                    import pdb; pdb.set_trace()
                     award_policy = policies.get(type=Policy.AWARD_POLICY)
                     intellect = Intellect()
                     intellect.learn(award_policy.rule)
