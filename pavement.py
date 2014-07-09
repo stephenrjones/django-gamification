@@ -44,7 +44,7 @@ setup(
 @task
 def install_dependencies():
     """ Installs dependencies."""
-    sh('pip install --upgrade -r gamification/requirements.txt')
+    sh('pip install --upgrade -r requirements.txt')
 
 
 @cmdopts([
