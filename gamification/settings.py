@@ -45,7 +45,7 @@ DATABASES = {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
         "NAME": "gamification",
         "USER": "game_manager",
-        "PASSWORD": "jds09K32rj80NLKDIU93l3d",
+        "PASSWORD": "django-gamification",
         "HOST": "localhost",
         "PORT": "5432"
     }
