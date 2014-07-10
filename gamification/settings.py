@@ -29,7 +29,7 @@ import os
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
 PACKAGE_ROOT = os.path.abspath(os.path.dirname(__file__))
-#SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
+SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -236,3 +236,9 @@ AUTHENTICATION_BACKENDS = [
 
 CORS_ORIGIN_WHITELIST = ( '192.168.5.1', '192.168.5.128:8000' )
 CORS_ALLOW_METHODS = ( 'GET', 'POST', 'OPTIONS' )
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    }
+}

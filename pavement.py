@@ -69,6 +69,8 @@ def install_dev_fixtures():
     for fixture in fixtures:
         sh("python manage.py loaddata {fixture}".format(fixture=fixture))
 
+    from django.contrib.sites.models import Site
+    Site.objects.create(domain='gamification.com', name='gamification.com')
 
 @task
 def sync_initial():

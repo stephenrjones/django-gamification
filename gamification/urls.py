@@ -31,11 +31,13 @@ from django.views.generic import TemplateView, ListView
 
 from django.contrib import admin
 admin.autodiscover()
+from django.views.generic import RedirectView
 from gamification.core.models import Project
 from gamification.core.views import MasterProjectListView, ProjectListView, UserProjectPointsView, BadgeListView, UserView, \
                                     MasterBadgeListView, master_project_list, project_all_badgeleaders_view, project_badgeleaders_view, \
                                     create_new_user
 from gamification.events.views import handle_event
+from django.core.urlresolvers import reverse_lazy
 
 urlpatterns = patterns("",
     url(r"^gamification/$", TemplateView.as_view(template_name="core/index.html"), name="home"),
@@ -51,7 +53,8 @@ urlpatterns = patterns("",
     url(r"^projects/(?P<projectname>\w+)/badges/(?P<badgename>\w+)/leaders/?$", project_badgeleaders_view),
     url(r'^badges/?$', MasterBadgeListView.as_view(template_name='core/master_badge_list.html'), name='master-badge-list'),
     url(r'^users/(?P<username>\w+)/projects/(?P<projectname>\w+)/event/?$', handle_event),
-    url(r'^users/(?P<username>\w+)/create/?$', create_new_user)
+    url(r'^users/(?P<username>\w+)/create/?$', create_new_user),
+    url(r'^/$', RedirectView.as_view(url=reverse_lazy('home'))),
 )
 
 # urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
