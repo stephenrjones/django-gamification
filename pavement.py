@@ -71,6 +71,13 @@ def install_dev_fixtures():
 
 
 @task
+def sync_initial():
+    sh("python manage.py syncdb; python manage.py migrate --all 2> /dev/null")
+    sh("python manage.py syncdb; python manage.py migrate --all 2> /dev/null")
+    sh("python manage.py syncdb; python manage.py migrate core")
+    sh("python manage.py syncdb; python manage.py migrate --all")
+
+@task
 def sync():
     """ Runs the syncdb process with migrations """
     sh("python manage.py migrate core")
