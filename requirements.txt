@@ -1,9 +1,11 @@
 --allow-external antlr-python-runtime
 --allow-unverified antlr-python-runtime
+--allow-external PIL
+--allow-unverified PIL
 
 Django==1.5.4
 Django-Select2==4.2.1
-#PIL==1.1.7 -- PIL should be installed via: apt-get build-dep python-imaging
+PIL==1.1.7
 Paver==1.2.1
 South==0.8.2
 django-appconf==0.6
