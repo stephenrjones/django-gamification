@@ -46,7 +46,7 @@ DATABASES = {
         "NAME": "gamification",
         "USER": "game_manager",
         "PASSWORD": "django-gamification",
-        "HOST": "localhost",
+        "HOST": "",
         "PORT": "5432"
     }
 }
