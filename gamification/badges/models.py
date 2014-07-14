@@ -38,14 +38,14 @@ class Badge(models.Model):
     
     @property
     def title(self):
-        return self.meta_badge.title
+        return self.name
     
     @property
     def description(self):
         return self.meta_badge.description
     
     def __unicode__(self):
-        return u"%s" % self.title
+        return u"%s" % self.name
     
     def get_absolute_url(self):
         return reverse('badge_detail', kwargs={'slug': self.id})
