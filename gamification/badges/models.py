@@ -26,9 +26,8 @@ else:
 class Badge(models.Model):
     name = models.CharField(max_length=255)
     level = models.CharField(max_length=1, choices=LEVEL_CHOICES)    
-    icon = models.ImageField(upload_to='badge_images')
-    value = 1
-    
+    icon = models.ImageField(upload_to='badge_images', blank=True, null=True)
+
     objects = BadgeManager()
     
     @property

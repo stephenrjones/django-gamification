@@ -224,8 +224,14 @@ def master_project_list(request):
 
 @api_view(('GET',))
 @renderer_classes((renderers.TemplateHTMLRenderer,renderers.JSONRenderer))
-def user_points_list(request,username):
-    user = get_object_or_404(User, username=username)
+def user_points_list(request,username=''):
+    if username:
+        user = get_object_or_404(User, username=username)
+    elif request.user.username:
+        user = get_object_or_404(User, username=request.user.username)
+    else:
+        return Response({"message":"username not provided"})
+
     queryset = badge_count(user)
 
     if request.accepted_renderer.format == 'html':
@@ -238,8 +244,8 @@ def user_points_list(request,username):
 
 @api_view(('GET',))
 @renderer_classes((renderers.TemplateHTMLRenderer,renderers.JSONRenderer))
-def user_project_points_list(request,username,projectname):
-    user = get_object_or_404(User, username=username)
+def user_project_points_list(request,projectname):
+    user = get_object_or_404(User, username=request.user.username)
     project = get_object_or_404(Project, name=projectname)
     totals = user_project_badge_count(user,project)
 
@@ -252,8 +258,8 @@ def user_project_points_list(request,username,projectname):
 
 @api_view(('GET',))
 @renderer_classes((renderers.TemplateHTMLRenderer,renderers.JSONRenderer))
-def user_project_badges_list(request,username,projectname):
-    user = get_object_or_404(User, username=username)
+def user_project_badges_list(request,projectname):
+    user = get_object_or_404(User, username=request.user.username)
     project = get_object_or_404(Project, name=projectname)
     projbadges = ProjectBadge.objects.filter(project=project).order_by('badge__level')
     prefix = 'https://' if request.is_secure() else 'http://'
