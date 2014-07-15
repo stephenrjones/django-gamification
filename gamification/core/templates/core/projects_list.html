@@ -2,51 +2,40 @@
 {% block content %}
 
 
-{% for project in profile %}
+{% if project.badges.count == 0 %}
+    <h2>No badges within the project</h2>
+{% endif %}
 
+{# List all Top 5 Badge Winners, if they exist #}
+{% for top_badge in top_n_badges %}
 <div class="row">
     <div class="col-md-6 col-md-offset-2">
         <div class="page-header">
-            <h2>Project Leaders for {{ project.description }}</h2>
+            <h4>Leaders for Badge: "{{ top_badge.name|capfirst }}"</h4>
+            <h5 style="background: lightskyblue;">{{ top_badge.description|capfirst }}</h5>
         </div>
     </div>
 </div>
-
-{% if not project.badges.count %}
-    <h2>No badges within the project</h2>
-{%  endif %}
-
-{% for badge in project.badges %}
-
-<div class="container">
-    <div class="row">
-        <div class="col-md-6 col-md-offset-2">
-            <div class="page-header">
-                <h3  style="background: lightskyblue;">{{ badge.description }}</h3>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-10 col-md-offset-1">
+{% if top_badge.leaders.count == 0 %}
+    No badges assigned yet
+{% else %}
+    <div class="container">
+        <div class="row">
             <table class="table table-bordered">
                 <thead>
                 <tr>
                     <th>Name</th>
-                    <th>Points Received</th>
                     <th>Badges Awarded</th>
                 </tr>
                 </thead>
                 <tbody>
-                {% for winner in badge.winners %}
+                {% for leader in top_badge.leaders %}
                 <tr>
                     <td>
-                        {{ winner.user__username }}
+                        {{ leader.user__username|capfirst }}
                     </td>
                     <td>
-                        {{ winner.points_count }}
-                    </td>
-                    <td>
-                        TODO
+                        {{ leader.awarded }}
                     </td>
                 </tr>
                 {% endfor %}
@@ -54,16 +43,8 @@
             </table>
         </div>
     </div>
-    <!-- div class="row">
-        <div class="col-md-4 col-md-offset-1">
-            <h3>Total Points: {{ badge.total }}</h3>
-        </div>
-    </div -->
-</div>
+{% endif %}
+{% endfor %}
 
-{% endfor %}
-{% endfor %}
+
 {% endblock %}
-
-
-

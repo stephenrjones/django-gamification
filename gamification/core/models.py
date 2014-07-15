@@ -80,6 +80,8 @@ class Points(models.Model):
     def get_absolute_url(self):
         return reverse('points-list', args=[self.id])
 
+    class Meta:
+        verbose_name_plural = "Points"
 
 
 class UserProfile(models.Model):

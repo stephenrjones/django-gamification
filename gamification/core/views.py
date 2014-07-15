@@ -100,7 +100,7 @@ class ProjectListView(ListView):
 
     def get_context_data(self, **kwargs):
         cv = super(ProjectListView, self).get_context_data(**kwargs)
-        cv['profile'] = top_n_badge_winners(cv['object_list'],5)
+        cv['top_n_badges'] = top_n_badge_winners(cv['object_list'],5)
         return cv
 
 class BadgeListView(ListView):

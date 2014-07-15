@@ -69,20 +69,20 @@ def top_n_points_winners(projects, n):
 
     return projects
 
-def top_n_badge_winners(project, num):
+def top_n_badge_winners(project, num=3):
     """
     Given a particular project, this returns the top n badge
     winners at each badge level.
 
     Example:
 
-     >>> top_five_badge_winners(Project.objects.filter(projectname='geoq'))
+     >>> top_n_badge_winners(Project.objects.filter(name='geoq'),5)
      [{'count': 0, 'badge__level': '1'}, {'count': 0, 'badge__level': '2'}, {'count': 0, 'badge__level': '3'}, {'count': 0, 'badge__level': '4'}]
 
     """
     projectbadges = ProjectBadge.objects.filter(project=project)
     ids = projectbadges.values('id')
-    badges = projectbadges.values('id','name','description')
+    badges = projectbadges.values('id','name','description','badge__icon')
 
     pbtu = ProjectBadgeToUser.objects.filter(projectbadge__in=ids)
     badges = list(badges)

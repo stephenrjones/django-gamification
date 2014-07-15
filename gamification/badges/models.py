@@ -49,7 +49,10 @@ class Badge(models.Model):
     
     def get_absolute_url(self):
         return reverse('badge_detail', kwargs={'slug': self.id})
-    
+
+    class Meta:
+        verbose_name_plural = "Badge Templates"
+
 
 class ProjectBadge(models.Model):
     project = models.ForeignKey('core.Project')
@@ -65,7 +68,7 @@ class ProjectBadge(models.Model):
     def meta_badge(self):
         from utils import registered_badges
         return registered_badges[self.id]
-        
+
     def award_to(self, user):
         #has_badge = self in user.badges.all()
         #if self.meta_badge.one_time_only and has_badge:
@@ -103,7 +106,13 @@ class ProjectBadgeToUser(models.Model):
     user = models.ForeignKey(User)
     created = models.DateTimeField(default=datetime.now)
 
+    class Meta:
+        verbose_name_plural = "Awarded Badges"
 
 class BadgeSettings(models.Model):
     awardLevel = models.IntegerField(default=1000)
     multipleAwards = models.BooleanField(default=True)
+
+    class Meta:
+        verbose_name_plural = "Badge Settings"
+
