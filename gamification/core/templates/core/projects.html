@@ -29,7 +29,7 @@
                 {% for project in object_list %}
                 <tr>
                     <td>
-                        {{ project.name }}
+                        <a href='/projects/{{ project.name }}'>{{ project.name }}</a>
                     </td>
                     <td>
                         {{ project.description }}

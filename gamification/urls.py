@@ -44,14 +44,17 @@ urlpatterns = patterns("",
     url(r"^users/?$", UserView.as_view(template_name='core/users.html'), name='user_list'),
     url(r"^users/(?P<username>\w+)/", include("gamification.core.urls")),
     url(r"^projects/$", master_project_list),
+
     url(r"^projects/all/", MasterProjectListView.as_view(template_name='core/masterprojects_list.html'), name='master-project-list'),
-    # url(r"^projects/(?P<projectname>\w+)/?$", ProjectListView.as_view(template_name='core/projects_list.html'), name='project-list'),
+    url(r"^projects/(?P<projectname>\w+)/?$", ProjectListView.as_view(template_name='core/projects_list.html'), name='project-list'),
+
     url(r"^projects/(?P<projectname>\w+)/leaders/?$", project_all_badgeleaders_view),
     # url(r"^projects/(?P<projectname>\w+)/badges/?$", BadgeListView.as_view(template_name='core/badge_list.html'), name='badge-list'),
     url(r"^projects/(?P<projectname>\w+)/badges/(?P<badgename>\w+)/leaders/?$", project_badgeleaders_view),
     url(r'^badges/?$', MasterBadgeListView.as_view(template_name='core/master_badge_list.html'), name='master-badge-list'),
     url(r'^users/(?P<username>\w+)/projects/(?P<projectname>\w+)/event/?$', handle_event),
-    url(r'^users/(?P<username>\w+)/create/?$', create_new_user)
+    url(r'^users/(?P<username>\w+)/create/?$', create_new_user),
+    url(r'^$', TemplateView.as_view(template_name="core/index.html"), name="home"),
 )
 
 # urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

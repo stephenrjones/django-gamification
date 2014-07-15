@@ -12,7 +12,9 @@
     </div>
 </div>
 
-
+{% if not project.badges.count %}
+    <h2>No badges within the project</h2>
+{%  endif %}
 
 {% for badge in project.badges %}
 
