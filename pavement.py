@@ -61,9 +61,9 @@ def install_fixture(options):
 def install_dev_fixtures():
     """ Installs development fixtures in the correct order """
     fixtures = [
-        'gamification/fixtures/initial_data.json',  # Users and site-wide data
         'gamification/core/fixtures/initial_data.json',  # Core
         'gamification/badges/fixtures/initial_data.json',  # Badges
+        'gamification/events/fixtures/initial_data.json', # Events
         ]
 
     for fixture in fixtures:
