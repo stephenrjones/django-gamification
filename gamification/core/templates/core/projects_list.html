@@ -14,6 +14,12 @@
     .badge-row:nth-child(odd) {
         background-color: lightyellow;
     }
+    .badge-row span.dtg {
+        display: inline; padding: 0px;
+    }
+    .badge-row span.awardee {
+        display: inline; padding: 0px; width: 150px;
+    }
     .badge-row span {
         display: inline-block; vertical-align: top; padding:10px;
     }
@@ -35,10 +41,39 @@
         {% else %}
             <h4>Top Badge Recipients:</h4>
             {% for leader in top_badge.leaders %}
-                <li><b>{{ leader.user__username|capfirst }} </b>: <i>(Received {{ leader.awarded }} times)</i></li>
+                <li><b>{{ leader.user__username|capfirst }} </b>: <i>(Received {{ leader.awarded }} time{{ leader.awarded|pluralize }})</i></li>
             {% endfor %}
         {% endif %}
     </span>
 </div>
 {% endfor %}
+
+    <hr/>
+
+{% for awardee,badges in badge_awards %}
+<div class="row badge-row">
+    <span style="width: 100px;"><b>{{ awardee|capfirst }}</b></span>
+    <span>
+        <b>{{ badges|length }} Badge{{ badges|pluralize }}:</b>
+        {% for badge in badges %}
+            <li><span class="awardee"><b>{{ badge.badge|capfirst }}</b></span>: <span class="dtg">{{ badge.date }}</span></li>
+        {% endfor %}
+    </span>
+</div>
+{% endfor %}
+
+<script>
+    $(document).ready(function(){
+        $('.dtg').each(function(){
+            var $item = $(this);
+            var dtg = $item.text();
+            var time = moment(dtg);
+            if (time.isValid()){
+                var newtime = time.calendar();
+                $item.text('Awarded '+newtime);
+            }
+        });
+    });
+</script>
+
 {% endblock %}

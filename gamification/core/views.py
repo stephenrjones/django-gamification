@@ -36,7 +36,7 @@ from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render, get_object_or_404
 import json
 from gamification.badges.utils import project_badge_count
-from gamification.core.utils import badge_count,top_n_badge_winners,user_project_badge_count, top_n_project_badge_winners
+from gamification.core.utils import badge_count,top_n_badge_winners,user_project_badge_count, top_n_project_badge_winners, project_badge_awards
 from gamification.core.models import Project
 from gamification.core.forms import AwardForm
 from gamification.core.serializers import ProjectSerializer, PointsSerializer
@@ -101,6 +101,7 @@ class ProjectListView(ListView):
     def get_context_data(self, **kwargs):
         cv = super(ProjectListView, self).get_context_data(**kwargs)
         cv['top_n_badges'] = top_n_badge_winners(cv['object_list'],5)
+        cv['badge_awards'] = project_badge_awards(cv['object_list'])
         return cv
 
 class BadgeListView(ListView):
