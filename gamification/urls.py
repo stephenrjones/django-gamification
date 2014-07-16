@@ -47,6 +47,7 @@ urlpatterns = patterns("",
 
     url(r"^projects/all/", MasterProjectListView.as_view(template_name='core/masterprojects_list.html'), name='master-project-list'),
     url(r"^projects/(?P<projectname>\w+)/?$", ProjectListView.as_view(template_name='core/projects_list.html'), name='project-list'),
+    url(r"^projects/(?P<projectname>\w+)/(?P<phrase>\w+)/?$", ProjectListView.as_view(template_name='core/projects_list.html'), name='project-list'),
 
     url(r"^projects/(?P<projectname>\w+)/leaders/?$", project_all_badgeleaders_view),
     # url(r"^projects/(?P<projectname>\w+)/badges/?$", BadgeListView.as_view(template_name='core/badge_list.html'), name='badge-list'),

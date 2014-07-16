@@ -99,11 +99,21 @@ class ProjectListView(ListView):
         return Project.objects.filter(name=self.kwargs['projectname'])
 
     def get_context_data(self, **kwargs):
-        cv = super(ProjectListView, self).get_context_data(**kwargs)
-        cv['top_n_badges'] = top_n_badge_winners(cv['object_list'],5)
-        cv['badge_awards'] = project_badge_awards(cv['object_list'])
-        cv['project'] = cv['object_list'][0]
-        return cv
+        context = super(ProjectListView, self).get_context_data(**kwargs)
+
+        try:
+            phrase = self.kwargs['phrase']
+        except:
+            phrase = ""
+
+        projects = context['object_list']
+
+        context['top_n_badges'] = top_n_badge_winners(projects,5)
+        context['badge_awards'] = project_badge_awards(projects)
+        context['project'] = projects[0]
+        context['code'] = phrase
+        return context
+
 
 class BadgeListView(ListView):
 
