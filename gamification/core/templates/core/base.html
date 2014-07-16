@@ -15,7 +15,6 @@
     <!--[if lt IE 9]>
     <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
     <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-
     <![endif]-->
 
     <script src="{{ STATIC_URL }}js/jquery.min.js"></script>
@@ -28,12 +27,29 @@
 
     <style>
     body {
-        margin: 50px 30px 30px;
+        margin: 50px 50px 30px;
     }
     .page-header {
         margin: 20px 0 0 0
     }
     </style>
+    <script>
+        $(document).ready(function(){
+            var url = document.location.pathname.split("/");
+            if (url && url.length && url.length>1){
+                url = url[1];
+
+                $('.navbar-nav li').each(function(){
+                    var $li = $(this);
+                    var this_tab = $li.text().trim().toLowerCase();
+                    $li.removeClass('active');
+                    if (url == this_tab){
+                        $li.addClass('active');
+                    }
+                });
+            }
+        })
+    </script>
 </head>
 <body>
 {% block container %}
@@ -87,6 +103,7 @@
     </div>
 </div>
 
+{% block header_title %}
 <div class="page-header" id="top-banner">
     <div class="row">
         <div class="col-md-6 col-md-offset-1">
@@ -95,6 +112,8 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
 {% block content %}Empty page{% endblock %}
 {% endblock %}
 </body>
