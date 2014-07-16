@@ -95,7 +95,6 @@ def top_n_badge_winners(project, num=3):
     Example:
 
      >>> top_n_badge_winners(Project.objects.filter(name='geoq'),5)
-
     """
     projectbadges = ProjectBadge.objects.filter(project=project)
     ids = projectbadges.values('id')

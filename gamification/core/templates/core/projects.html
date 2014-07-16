@@ -21,7 +21,6 @@
                     <th>Project Name</th>
                     <th>Project Description</th>
                     <th>Created</th>
-                    <th>Awards Available</th>
                     <th>Project Leaderboard</th>
                 </tr>
                 </thead>
@@ -38,14 +37,7 @@
                         {{ project.created_at }}
                     </td>
                     <td>
-                        <button type="button" class="btn btn-default btn-sm" onclick="location.href='/projects/{{ project.name }}/badges'">
-                            <span class="glyphicon glyphicon-list" ></span>
-                        </button>
-                    </td>
-                    <td>
-                        <button type="button" class="btn btn-default btn-sm" onclick="location.href='/projects/{{ project.name }}'">
-                            <span class="glyphicon glyphicon-list" ></span>
-                        </button>
+                        <a class="btn" href="/projects/{{ project.name }}"><i class="icon-list"></i></a>
                     </td>
                 </tr>
                 {% endfor %}
