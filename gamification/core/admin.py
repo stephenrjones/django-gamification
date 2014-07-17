@@ -27,7 +27,7 @@ import reversion
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django import forms
-from models import Project, UserProfile
+from models import Project, UserProfile, Points
 from django.contrib import admin
 
 class ObjectAdmin(admin.ModelAdmin):
@@ -38,5 +38,10 @@ class UserProfileAdmin(ObjectAdmin):
     list_display = ('user','score')
     
 
+class PointAdmin(admin.ModelAdmin):
+    list_display = ('user', 'date_awarded', 'projectbadge', 'value')
+
+
 admin.site.register(Project, ObjectAdmin)
 #admin.site.register(UserProfile, UserProfileAdmin)
+admin.site.register(Points, PointAdmin)
