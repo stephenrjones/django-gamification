@@ -31,13 +31,34 @@ from django.core.exceptions import ObjectDoesNotExist
 from gamification.core.models import Project
 from gamification.events.models import Event,Policy
 from gamification.events.state import State
-from gamification.badges.models import ProjectBadge
+from gamification.badges.models import ProjectBadge, ProjectBadgeToUser
 from intellect.Intellect import Intellect
 import json
 import logging, sys
 
 # For debug
 from datetime import datetime
+
+def assign_badge(request, *args, **kwargs):
+    is_admin = request.user.is_superuser or request.user.groups.filter(name='admin_group').count() > 0
+    if not is_admin:
+        return HttpResponse('{"status":"Aborted", "error":"Unauthorized"}', mimetype="application/json", status=401)
+
+    # Get user and project
+    user = get_object_or_404(User,username=kwargs['username'])
+    badge = get_object_or_404(ProjectBadge,id=kwargs['badge'])
+    event_dtg = timezone.now()
+
+    try:
+        current_badge = ProjectBadgeToUser(user=user, projectbadge=badge, created=event_dtg)
+        current_badge.save()
+    except ValueError, ve:
+        #print('handle_event failed create event: {0}').format(ve)
+        return HttpResponse('{"status":"Invalid Badge Creation","error":"'+str(ve)+'"}', mimetype="application/json", status=500)
+
+    return HttpResponse('{"status":"Badge Created", "id":'+str(current_badge.id)+'}', mimetype="application/json", status=200)
+
+
 
 def handle_event(request, *args, **kwargs):
     if request.method == 'POST':

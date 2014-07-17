@@ -2,7 +2,7 @@
 
 {% block header_title %}
     <div id="header_title">
-        <h1>{{ project.name|capfirst }}</h1>
+        <h1>{{ project.name|title }}</h1>
         <b>{{ project.description|capfirst|default:"Gamification Project" }}</b>
     </div>
 {% endblock %}
@@ -34,6 +34,16 @@
     </script>
 {% else %}
     <style>
+        div.row {
+            margin-left: 0px;
+        }
+        .badge-row.leader {
+            padding: 0px; line-height: 1em;
+        }
+        .badge-row.leader img{
+            padding: 0px;width: 24px;vertical-align: baseline;
+        }
+
         .badge-row {
             padding:5px; border:1px solid gray
         }
@@ -61,14 +71,6 @@
         #header_title {
             margin-bottom: 20px;
         }
-        .hidden-submit {
-            border: 0 none;
-            height: 0;
-            width: 0;
-            padding: 0;
-            margin: 0;
-            overflow: hidden;
-        }
     </style>
     <script>
         var project_info = {};
@@ -76,46 +78,7 @@
         project_info.description = '{{ project.description|default:"" }}';
         project_info.name = '{{ project.name|default:"" }}';
         project_info.id = '{{ project.id }}';
-    </script>
 
-    {# List all Top 5 Badge Winners, if they exist #}
-    {% for top_badge in top_n_badges %}
-    <div class="row badge-row">
-        <span style="width: 100px;">
-            <img src="/static/{{  top_badge.badge__icon|default:'badge_icons/default.png' }}" width="90"/>
-        </span>
-        <span style="width: 500px;">
-            <b>{{ top_badge.name|capfirst }}</b><br/>
-            <i>{{ top_badge.description|capfirst }}</i>
-        </span>
-        <span>
-            {% if not top_badge.leaders %}
-                <i>No badges assigned yet</i>
-            {% else %}
-                <h4>Top Badge Recipients:</h4>
-                {% for leader in top_badge.leaders %}
-                    <li><b>{{ leader.user__username|capfirst }} </b>: <i>(Received {{ leader.awarded }} time{{ leader.awarded|pluralize }})</i></li>
-                {% endfor %}
-            {% endif %}
-        </span>
-    </div>
-    {% endfor %}
-
-        <hr/>
-
-    {% for awardee,badges in badge_awards %}
-    <div class="row badge-row">
-        <span style="width: 100px;"><b>{{ awardee|capfirst }}</b></span>
-        <span>
-            <b>{{ badges|length }} Badge{{ badges|pluralize }}:</b>
-            {% for badge in badges %}
-                <li><span class="awardee"><b>{{ badge.badge|capfirst }}</b></span>: <span class="dtg">{{ badge.date }}</span></li>
-            {% endfor %}
-        </span>
-    </div>
-    {% endfor %}
-
-    <script>
         $(document).ready(function(){
             $('.dtg').each(function(){
                 var $item = $(this);
@@ -128,5 +91,77 @@
             });
         });
     </script>
+
+    <ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
+        <li class="active"><a href="#leader_board" data-toggle="tab">Leader board</a></li>
+        <li><a href="#badge_leaders" data-toggle="tab">Badge Leaders</a></li>
+        <li><a href="#badge_list" data-toggle="tab">Badge List</a></li>
+    </ul>
+    <div id="my-tab-content" class="tab-content">
+        <div class="tab-pane active" id="leader_board">
+            <h1>Leader Board</h1>
+
+                {# -- Leader Board -- #}
+                {% for awardee,badges in badge_awards %}
+                <div class="row badge-row leader">
+                    <span style="width: 80px;"><b>{{ awardee|capfirst }}</b></span>
+                    <span><b>{{ badges|length }}: </b></span>
+                    {% for badge in badges %}
+                        <img src="/static/{{ badge.icon }}" title="{{ badge.badge }}"/>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+
+        </div>
+        <div class="tab-pane" id="badge_leaders">
+            <h1>Badge Leaders</h1>
+
+                {# -- Top Badge Winners -- #}
+                {% for top_badge in top_n_badges %}
+                <div class="row badge-row">
+                    <span style="width: 100px;">
+                        <img src="/static/{{  top_badge.badge__icon|default:'badge_icons/default.png' }}" width="90"/>
+                    </span>
+                    <span style="width: 500px;">
+                        <b>{{ top_badge.name|title }}</b><br/>
+                        <i>{{ top_badge.description|capfirst }}</i>
+                    </span>
+                    <span>
+                        {% if not top_badge.leaders %}
+                            <i>No badges assigned yet</i>
+                        {% else %}
+                            <h4>Top Badge Recipients:</h4>
+                            {% for leader in top_badge.leaders %}
+                                <li><b>{{ leader.user__username }} </b>: <i>(Received {{ leader.awarded }} time{{ leader.awarded|pluralize }})</i></li>
+                            {% endfor %}
+                        {% endif %}
+                    </span>
+                </div>
+                {% endfor %}
+
+        </div>
+        <div class="tab-pane" id="badge_list">
+            <h1>Badge List</h1>
+
+                {# -- All Badge Recipients -- #}
+                {% for awardee,badges in badge_awards %}
+                <div class="row badge-row">
+                    <span style="width: 100px;"><b>{{ awardee }}</b></span>
+                    <span>
+                        <b>{{ badges|length }} Badge{{ badges|pluralize }}:</b>
+                        {% for badge in badges %}
+                            <li><img src="/static/{{ badge.icon }}" style="width: 20px"/> <span class="awardee"><b>{{ badge.badge|title }}</b></span>: <span class="dtg">{{ badge.date }}</span></li>
+                        {% endfor %}
+                    </span>
+                </div>
+                {% endfor %}
+
+        </div>
+    </div>
+
+    {%  if admin %}
+        <button type="button" class="btn btn-primary btn-sm" onclick="location.href='/projects/{{ project.name }}/admin'">Admin: Add Badges to Users</button>
+    {%  endif %}
+
 {% endif %}
 {% endblock %}

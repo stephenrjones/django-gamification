@@ -102,7 +102,7 @@ class Policy(models.Model):
 
     STATE_POLICY = 0
     AWARD_POLICY = 1
-    POLICY_CHOICES = ( (STATE_POLICY, 'State Policy'), (AWARD_POLICY, 'Award Policy') )
+    POLICY_CHOICES = ( (STATE_POLICY, 'State Policy'), (AWARD_POLICY, 'Award Policy'), )
 
     project = models.ForeignKey(Project)
     projectbadge = models.ForeignKey(ProjectBadge)
@@ -110,7 +110,11 @@ class Policy(models.Model):
     rule = models.TextField()
 
     def __unicode__(self):
-        return u"%s for %s on %s" % (self.POLICY_CHOICES[type][1],projectbadge.name,project.name)
+        try:
+            kind = self.POLICY_CHOICES[self.projectbadge.type][1]
+        except:
+            kind = 'Policy'
+        return u"%s for %s on %s" % (kind, self.projectbadge.name, self.project.name)
 
 
 #class Rule(models.Model):

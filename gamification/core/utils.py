@@ -78,14 +78,15 @@ def project_badge_awards(project):
     ids = projectbadges.values('id')
     pbtu = ProjectBadgeToUser.objects.filter(projectbadge__in=ids)
 
-    user_badges = pbtu.values('user__username', 'projectbadge__name', 'created')
+    user_badges = pbtu.values('user__username', 'projectbadge__name', 'created', 'projectbadge__badge__icon')
 
     from collections import defaultdict
     groups = defaultdict(list)
     for obj in user_badges:
-        groups[obj['user__username']].append({'badge':str(obj['projectbadge__name']),'date':str(obj['created'])})
+        groups[obj['user__username']].append({'badge':str(obj['projectbadge__name']),'date':str(obj['created']),'icon':str(obj['projectbadge__badge__icon'])})
 
-    return groups.items()
+    #Sort by number of badges in reverse order
+    return sorted(groups.iteritems(),key=lambda (k,v): len(v),reverse=True)
 
 def top_n_badge_winners(project, num=3):
     """
