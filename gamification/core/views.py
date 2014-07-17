@@ -43,6 +43,7 @@ from gamification.core.serializers import ProjectSerializer, PointsSerializer
 from rest_framework import renderers
 from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.response import Response
+from django.contrib.auth.decorators import login_required
 
 
 class PointsListView(ListView):
@@ -112,6 +113,27 @@ class ProjectListView(ListView):
         context['badge_awards'] = project_badge_awards(projects)
         context['project'] = projects[0]
         context['code'] = phrase
+        context['admin'] = self.request.user.is_superuser or self.request.user.groups.filter(name='admin_group').count() > 0
+        return context
+
+
+class ProjectAdminListView(ListView):
+
+    model = Project
+
+    def get_queryset(self):
+        return Project.objects.filter(name=self.kwargs['projectname'])
+
+    def get_context_data(self, **kwargs):
+        context = super(ProjectAdminListView, self).get_context_data(**kwargs)
+
+        project = context['object_list'][0]
+
+        context['project'] = project
+        context['all_users'] = User.objects.all()
+        context['badges'] = ProjectBadge.objects.filter(project=project)
+        context['admin'] = self.request.user.is_superuser or self.request.user.groups.filter(name='admin_group').count() > 0
+
         return context
 
 
@@ -241,7 +263,7 @@ def user_points_list(request,username):
     queryset = badge_count(user)
 
     if request.accepted_renderer.format == 'html':
-        data = {'profile': queryset}
+        data = {'profile': queryset, 'username': user.username}
         return Response(data, template_name='core/points_list.html')
 
     #JSON Renderer

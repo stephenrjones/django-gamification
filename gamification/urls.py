@@ -34,8 +34,8 @@ admin.autodiscover()
 from gamification.core.models import Project
 from gamification.core.views import MasterProjectListView, ProjectListView, UserProjectPointsView, BadgeListView, UserView, \
                                     MasterBadgeListView, master_project_list, project_all_badgeleaders_view, project_badgeleaders_view, \
-                                    create_new_user
-from gamification.events.views import handle_event
+                                    create_new_user, ProjectAdminListView
+from gamification.events.views import handle_event, assign_badge
 
 urlpatterns = patterns("",
     url(r"^gamification/$", TemplateView.as_view(template_name="core/index.html"), name="home"),
@@ -47,6 +47,8 @@ urlpatterns = patterns("",
 
     url(r"^projects/all/", MasterProjectListView.as_view(template_name='core/masterprojects_list.html'), name='master-project-list'),
     url(r"^projects/(?P<projectname>\w+)/?$", ProjectListView.as_view(template_name='core/projects_list.html'), name='project-list'),
+    url(r"^projects/(?P<projectname>\w+)/admin/?$", ProjectAdminListView.as_view(template_name='core/project_admin.html'), name='project-admin'),
+
     url(r"^projects/(?P<projectname>\w+)/(?P<phrase>\w+)/?$", ProjectListView.as_view(template_name='core/projects_list.html'), name='project-list'),
 
     url(r"^projects/(?P<projectname>\w+)/leaders/?$", project_all_badgeleaders_view),
@@ -54,6 +56,7 @@ urlpatterns = patterns("",
     url(r"^projects/(?P<projectname>\w+)/badges/(?P<badgename>\w+)/leaders/?$", project_badgeleaders_view),
     url(r'^badges/?$', MasterBadgeListView.as_view(template_name='core/master_badge_list.html'), name='master-badge-list'),
     url(r'^users/(?P<username>\w+)/projects/(?P<projectname>\w+)/event/?$', handle_event),
+    url(r'^users/(?P<username>\w+)/assign_badge/(?P<badge>\w+)?$', assign_badge),
     url(r'^users/(?P<username>\w+)/create/?$', create_new_user),
     url(r'^$', TemplateView.as_view(template_name="core/index.html"), name="home"),
 )

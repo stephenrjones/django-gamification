@@ -1,0 +1,84 @@
+{% extends 'core/base.html' %}
+
+{% block header_title %}
+    <div id="header_title">
+        <h1>Administer badges within: <a href='/projects/{{ project.name }}/'>{{ project.name|capfirst }}</a></h1>
+    </div>
+{% endblock %}
+
+{% block content %}
+
+    <style>
+        #header_title h1{
+            margin:0px;
+        }
+        #header_title {
+            margin-bottom: 20px;
+        }
+    </style>
+    <script>
+        var project_info = {};
+        project_info.closing_date = '{{ project.project_closing_date|default:"" }}';
+        project_info.description = '{{ project.description|default:"" }}';
+        project_info.name = '{{ project.name|default:"" }}';
+        project_info.id = '{{ project.id }}';
+
+        $(document).ready(function(){
+            $('#create_user_button').click(function(){
+                var username = $('#username').val();
+                if (username) {
+                    document.location.href = '/users/'+username+'/create/';
+                }
+            });
+
+            $('#assign_badge_button').click(function(){
+                var username = $('#username_to').val();
+                var badge_id = $('#badge_id').val();
+                if (username && badge_id && username!='root') {
+                    var url = "/users/"+username+"/assign_badge/"+badge_id;
+                    $.post( url, function( data ) {
+                        var status = data.status || "Invalid response";
+                        $( "#result" ).html( status );
+                        setTimeout(function(){ $( "#result" ).html("")}, 5000);
+                    });
+                }
+            });
+        });
+    </script>
+
+    {% if admin %}
+
+{#    <h2>Edit Project Info</h2>#}
+{# Add Form #}
+{#    <textarea id="project_description">{{ project.description }}</textarea>#}
+{#    <input type="submit"/>#}
+{#    Ending Date#}
+
+    <h2>Assign a badge to a user:</h2>
+{# Add Form #}
+    <select id="badge_id">
+    {% for badge in badges %}
+        <option value="{{ badge.id }}">{{ badge.name }}</option>
+    {% endfor %}
+    </select>
+
+    <select id="username_to">
+    {% for user in all_users %}
+        <option value="{{ user.username }}">{{ user.username }}</option>
+    {% endfor %}
+    </select>
+    <input type="button" id="assign_badge_button" value="Create Badge"/> <span id="result"></span>
+    <br/>
+    <button type="button" class="btn btn-primary btn-sm" onclick="location.href='/admin/badges/projectbadgetouser'">Edit badge assignments manually</button>
+    <button type="button" class="btn btn-primary btn-sm" onclick="location.href='/admin/badges/projectbadge/'">Edit badges</button>
+
+
+    <h2>Create a new user</h2>
+    Username (one word): <input type="text" id="username" value=""/>
+    <input id="create_user_button" type="button" value="Go to user creation page"/> (push 'POST' on bottom to create)
+
+    {%  else %}
+        <h1>Access Denied</h1>
+    {% endif %}
+
+{% endblock %}

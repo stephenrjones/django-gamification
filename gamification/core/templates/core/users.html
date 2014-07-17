@@ -41,9 +41,7 @@
                         {{ user.email }}
                     </td>
                     <td>
-                        <button type="button" class="btn btn-default btn-sm" onclick="location.href='/users/{{ user.username }}/points'">
-                            <span class="glyphicon glyphicon-list" ></span>
-                        </button>
+                        <a class="btn" href="/users/{{ user.username }}/points"><i class="icon-list"></i></a>
                     </td>
                 </tr>
                 {% endfor %}

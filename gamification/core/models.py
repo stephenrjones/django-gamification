@@ -60,11 +60,12 @@ class Project(ProjectBase):
     """
 
     private = models.BooleanField(default=False, help_text='Make this project available to all users.')
-    #supervisors = models.ManyToManyField(User, blank=True, null=True, related_name="supervisors")
-    #teams = models.ManyToManyField(User, blank=True, null=True, related_name="supervisors")
+    #supervisors = models.ManyToManyField(User, blank=True, null=True, related_name="supervisors") #TODO: Add Supervisor Screen
+    #teams = models.ManyToManyField(User, blank=True, null=True, related_name="supervisors")  #TODO: Add Teams
     viewing_pass_phrase = models.CharField(max_length=200, null=True, blank=True, help_text='Phrase that must be entered to view this page.')
     query_token = models.CharField(max_length=200, null=True, blank=True, help_text='Token that must be entered by any server requesting data - not implemented yet.')
     project_closing_date = models.DateTimeField(null=True, blank=True, help_text='Date that project "closes" with countdown shown on viewing page. Badges can still be added after this.')
+    #TODO: Add Images for leaderboard
 
     @property
     def user_count(self):
