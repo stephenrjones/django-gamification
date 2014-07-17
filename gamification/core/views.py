@@ -250,12 +250,13 @@ def user_points_list(request,username):
 
 @api_view(('GET',))
 @renderer_classes((renderers.TemplateHTMLRenderer,renderers.JSONRenderer))
-def user_project_points_list(request,username,projectname):
+def user_project_points_list(request,username,projectname,rendertype='html'):
     user = get_object_or_404(User, username=username)
     project = get_object_or_404(Project, name=projectname)
     totals = user_project_badge_count(user,project)
 
-    if request.accepted_renderer.format == 'html':
+    rendertype = rendertype or request.accepted_renderer.format
+    if rendertype == 'html':
         data = {'projectbadges': totals, 'username': user.username, 'projectname':project.description}
         return Response(data, template_name='core/user_project_points_list.html')
 
@@ -264,7 +265,7 @@ def user_project_points_list(request,username,projectname):
 
 @api_view(('GET',))
 @renderer_classes((renderers.TemplateHTMLRenderer,renderers.JSONRenderer))
-def user_project_badges_list(request,username,projectname):
+def user_project_badges_list(request,username,projectname,rendertype='html'):
     user = get_object_or_404(User, username=username)
     project = get_object_or_404(Project, name=projectname)
     projbadges = ProjectBadge.objects.filter(project=project).order_by('badge__level')
@@ -273,7 +274,8 @@ def user_project_badges_list(request,username,projectname):
 
     badges = project_badge_count(user,project,projbadges,url)
 
-    if request.accepted_renderer.format == 'html':
+    rendertype = rendertype or request.accepted_renderer.format
+    if rendertype == 'html':
         data = {'profile': badges}
         return Response(data, template_name='core/badge_list.html')
 
