@@ -24,6 +24,7 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import json
+import datetime
 from django.contrib.auth.models import User
 from gamification.core.models import Project, ProjectBadge
 from django.db import models
@@ -53,6 +54,10 @@ class Event(models.Model):
         super(Event, self).save(*args, **kw)
 
     @property
+    def dtg(self):
+        return self.event_dtg
+
+    @property
     def details_map(self):
         return self._details_map
     
@@ -72,6 +77,10 @@ class Event(models.Model):
     def is_current_event(self):
         return self._current_event
 
+    @property
+    def is_today(self):
+        return datetime.datetime.date() == event_dtg.date()
+
     @state.setter
     def current_event(self, current_event_id):
         self._current_event = (self.id == current_event_id)
@@ -83,6 +92,7 @@ class Event(models.Model):
                 self._state._event_data[outer_key] = {}
             self._state._event_data[outer_key][inner_key] = inner_value 
         except AttributeError:
+            print 'AttributeError'
             pass
 
 class Policy(models.Model):

@@ -234,5 +234,5 @@ AUTHENTICATION_BACKENDS = [
     "account.auth_backends.UsernameAuthenticationBackend",
 ]
 
-CORS_ORIGIN_WHITELIST = ( '192.168.5.1', '192.168.5.128:8000' )
+CORS_ORIGIN_WHITELIST = ( '192.168.5.128:8000', 'localhost:8000', )
 CORS_ALLOW_METHODS = ( 'GET', 'POST', 'OPTIONS' )
