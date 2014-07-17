@@ -1,67 +1,132 @@
 {% extends 'core/base.html' %}
-{% block content %}
 
-
-{% for project in profile %}
-
-<div class="row">
-    <div class="col-md-6 col-md-offset-2">
-        <div class="page-header">
-            <h2>Project Leaders for {{ project.description }}</h2>
-        </div>
+{% block header_title %}
+    <div id="header_title">
+        <h1>{{ project.name|capfirst }}</h1>
+        <b>{{ project.description|capfirst|default:"Gamification Project" }}</b>
     </div>
-</div>
-
-
-
-{% for badge in project.badges %}
-
-<div class="container">
-    <div class="row">
-        <div class="col-md-6 col-md-offset-2">
-            <div class="page-header">
-                <h3  style="background: lightskyblue;">{{ badge.description }}</h3>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-10 col-md-offset-1">
-            <table class="table table-bordered">
-                <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Points Received</th>
-                    <th>Badges Awarded</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for winner in badge.winners %}
-                <tr>
-                    <td>
-                        {{ winner.user__username }}
-                    </td>
-                    <td>
-                        {{ winner.points_count }}
-                    </td>
-                    <td>
-                        TODO
-                    </td>
-                </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-    <!-- div class="row">
-        <div class="col-md-4 col-md-offset-1">
-            <h3>Total Points: {{ badge.total }}</h3>
-        </div>
-    </div -->
-</div>
-
-{% endfor %}
-{% endfor %}
 {% endblock %}
 
+{% block content %}
 
+{% if project.viewing_pass_phrase  and project.viewing_pass_phrase != code %}
+    <form method="get" id="phrase_form" action="">{% csrf_token %}
+        This page is protected from public viewing. Please enter entry code: <input type="text" id="entry_code" />
+        <input type="button" id="enter_phrase" value="Reveal Results"/>
+    </form>
+    <script>
+        var text_input = document.getElementById('entry_code');
+        text_input.focus ();
+        text_input.select ();
+        $(document).ready(function(){
+            $('#enter_phrase').click(function(){
+                var phrase = $('#entry_code').val();
+                document.location.href = "/projects/{{ project.name }}/" + phrase;
+            });
 
+            $('#entry_code').on('input',function(){
+                var phrase = $('#entry_code').val();
+                var $form = $('#phrase_form');
+                $form.attr('action',"/projects/{{ project.name }}/" + phrase);
+            });
+
+        });
+    </script>
+{% else %}
+    <style>
+        .badge-row {
+            padding:5px; border:1px solid gray
+        }
+        .badge-row h4 {
+            margin: 0px 0px 5px 0px;
+        }
+        .badge-row:nth-child(even) {
+            background-color: lightcyan;
+        }
+        .badge-row:nth-child(odd) {
+            background-color: lightyellow;
+        }
+        .badge-row span.dtg {
+            display: inline; padding: 0px;
+        }
+        .badge-row span.awardee {
+            display: inline; padding: 0px; width: 150px;
+        }
+        .badge-row span {
+            display: inline-block; vertical-align: top; padding:10px;
+        }
+        #header_title h1{
+            margin:0px;
+        }
+        #header_title {
+            margin-bottom: 20px;
+        }
+        .hidden-submit {
+            border: 0 none;
+            height: 0;
+            width: 0;
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+        }
+    </style>
+    <script>
+        var project_info = {};
+        project_info.closing_date = '{{ project.project_closing_date|default:"" }}';
+        project_info.description = '{{ project.description|default:"" }}';
+        project_info.name = '{{ project.name|default:"" }}';
+        project_info.id = '{{ project.id }}';
+    </script>
+
+    {# List all Top 5 Badge Winners, if they exist #}
+    {% for top_badge in top_n_badges %}
+    <div class="row badge-row">
+        <span style="width: 100px;">
+            <img src="/static/{{  top_badge.badge__icon|default:'badge_icons/default.png' }}" width="90"/>
+        </span>
+        <span style="width: 500px;">
+            <b>{{ top_badge.name|capfirst }}</b><br/>
+            <i>{{ top_badge.description|capfirst }}</i>
+        </span>
+        <span>
+            {% if not top_badge.leaders %}
+                <i>No badges assigned yet</i>
+            {% else %}
+                <h4>Top Badge Recipients:</h4>
+                {% for leader in top_badge.leaders %}
+                    <li><b>{{ leader.user__username|capfirst }} </b>: <i>(Received {{ leader.awarded }} time{{ leader.awarded|pluralize }})</i></li>
+                {% endfor %}
+            {% endif %}
+        </span>
+    </div>
+    {% endfor %}
+
+        <hr/>
+
+    {% for awardee,badges in badge_awards %}
+    <div class="row badge-row">
+        <span style="width: 100px;"><b>{{ awardee|capfirst }}</b></span>
+        <span>
+            <b>{{ badges|length }} Badge{{ badges|pluralize }}:</b>
+            {% for badge in badges %}
+                <li><span class="awardee"><b>{{ badge.badge|capfirst }}</b></span>: <span class="dtg">{{ badge.date }}</span></li>
+            {% endfor %}
+        </span>
+    </div>
+    {% endfor %}
+
+    <script>
+        $(document).ready(function(){
+            $('.dtg').each(function(){
+                var $item = $(this);
+                var dtg = $item.text();
+                var time = moment(dtg);
+                if (time.isValid()){
+                    var newtime = time.calendar();
+                    $item.text('Awarded '+newtime);
+                }
+            });
+        });
+    </script>
+{% endif %}
+{% endblock %}

@@ -36,7 +36,7 @@ from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render, get_object_or_404
 import json
 from gamification.badges.utils import project_badge_count
-from gamification.core.utils import badge_count,top_n_badge_winners,user_project_badge_count, top_n_project_badge_winners
+from gamification.core.utils import badge_count,top_n_badge_winners,user_project_badge_count, top_n_project_badge_winners, project_badge_awards
 from gamification.core.models import Project
 from gamification.core.forms import AwardForm
 from gamification.core.serializers import ProjectSerializer, PointsSerializer
@@ -99,9 +99,21 @@ class ProjectListView(ListView):
         return Project.objects.filter(name=self.kwargs['projectname'])
 
     def get_context_data(self, **kwargs):
-        cv = super(ProjectListView, self).get_context_data(**kwargs)
-        cv['profile'] = top_n_badge_winners(cv['object_list'],5)
-        return cv
+        context = super(ProjectListView, self).get_context_data(**kwargs)
+
+        try:
+            phrase = self.kwargs['phrase']
+        except:
+            phrase = ""
+
+        projects = context['object_list']
+
+        context['top_n_badges'] = top_n_badge_winners(projects,5)
+        context['badge_awards'] = project_badge_awards(projects)
+        context['project'] = projects[0]
+        context['code'] = phrase
+        return context
+
 
 class BadgeListView(ListView):
 
@@ -238,12 +250,13 @@ def user_points_list(request,username):
 
 @api_view(('GET',))
 @renderer_classes((renderers.TemplateHTMLRenderer,renderers.JSONRenderer))
-def user_project_points_list(request,username,projectname):
+def user_project_points_list(request,username,projectname,rendertype='html'):
     user = get_object_or_404(User, username=username)
     project = get_object_or_404(Project, name=projectname)
     totals = user_project_badge_count(user,project)
 
-    if request.accepted_renderer.format == 'html':
+    rendertype = rendertype or request.accepted_renderer.format
+    if rendertype == 'html':
         data = {'projectbadges': totals, 'username': user.username, 'projectname':project.description}
         return Response(data, template_name='core/user_project_points_list.html')
 
@@ -252,7 +265,7 @@ def user_project_points_list(request,username,projectname):
 
 @api_view(('GET',))
 @renderer_classes((renderers.TemplateHTMLRenderer,renderers.JSONRenderer))
-def user_project_badges_list(request,username,projectname):
+def user_project_badges_list(request,username,projectname,rendertype='html'):
     user = get_object_or_404(User, username=username)
     project = get_object_or_404(Project, name=projectname)
     projbadges = ProjectBadge.objects.filter(project=project).order_by('badge__level')
@@ -261,7 +274,8 @@ def user_project_badges_list(request,username,projectname):
 
     badges = project_badge_count(user,project,projbadges,url)
 
-    if request.accepted_renderer.format == 'html':
+    rendertype = rendertype or request.accepted_renderer.format
+    if rendertype == 'html':
         data = {'profile': badges}
         return Response(data, template_name='core/badge_list.html')
 

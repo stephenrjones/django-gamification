@@ -42,8 +42,8 @@ class ProjectBase(models.Model):
 
     active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    name = models.CharField(max_length=200)
-    description = models.TextField()
+    name = models.CharField(max_length=200, help_text='Name of the project.')
+    description = models.TextField(help_text='Details of this project that will be listed on the viewing page.')
     updated_at = models.DateTimeField(auto_now=True)
 
     def __unicode__(self):
@@ -61,6 +61,10 @@ class Project(ProjectBase):
 
     private = models.BooleanField(default=False, help_text='Make this project available to all users.')
     #supervisors = models.ManyToManyField(User, blank=True, null=True, related_name="supervisors")
+    #teams = models.ManyToManyField(User, blank=True, null=True, related_name="supervisors")
+    viewing_pass_phrase = models.CharField(max_length=200, null=True, blank=True, help_text='Phrase that must be entered to view this page.')
+    query_token = models.CharField(max_length=200, null=True, blank=True, help_text='Token that must be entered by any server requesting data - not implemented yet.')
+    project_closing_date = models.DateTimeField(null=True, blank=True, help_text='Date that project "closes" with countdown shown on viewing page. Badges can still be added after this.')
 
     @property
     def user_count(self):
@@ -80,6 +84,8 @@ class Points(models.Model):
     def get_absolute_url(self):
         return reverse('points-list', args=[self.id])
 
+    class Meta:
+        verbose_name_plural = "Points"
 
 
 class UserProfile(models.Model):

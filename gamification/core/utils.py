@@ -69,20 +69,36 @@ def top_n_points_winners(projects, n):
 
     return projects
 
-def top_n_badge_winners(project, num):
+def project_badge_awards(project):
+    """
+    Given a particular project, this returns all badge winners.
+    """
+    projectbadges = ProjectBadge.objects.filter(project=project)
+
+    ids = projectbadges.values('id')
+    pbtu = ProjectBadgeToUser.objects.filter(projectbadge__in=ids)
+
+    user_badges = pbtu.values('user__username', 'projectbadge__name', 'created')
+
+    from collections import defaultdict
+    groups = defaultdict(list)
+    for obj in user_badges:
+        groups[obj['user__username']].append({'badge':str(obj['projectbadge__name']),'date':str(obj['created'])})
+
+    return groups.items()
+
+def top_n_badge_winners(project, num=3):
     """
     Given a particular project, this returns the top n badge
     winners at each badge level.
 
     Example:
 
-     >>> top_five_badge_winners(Project.objects.filter(projectname='geoq'))
-     [{'count': 0, 'badge__level': '1'}, {'count': 0, 'badge__level': '2'}, {'count': 0, 'badge__level': '3'}, {'count': 0, 'badge__level': '4'}]
-
+     >>> top_n_badge_winners(Project.objects.filter(name='geoq'),5)
     """
     projectbadges = ProjectBadge.objects.filter(project=project)
     ids = projectbadges.values('id')
-    badges = projectbadges.values('id','name','description')
+    badges = projectbadges.values('id','name','description','badge__icon')
 
     pbtu = ProjectBadgeToUser.objects.filter(projectbadge__in=ids)
     badges = list(badges)
