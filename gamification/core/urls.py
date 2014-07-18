@@ -24,7 +24,7 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 from django.conf.urls import patterns, url, include
-from views import user_points_list, user_project_points_list, user_project_badges_list
+from views import user_points_list, user_project_points_list, user_project_badges_list, user_points
 
 
 urlpatterns = patterns('',
@@ -34,6 +34,7 @@ urlpatterns = patterns('',
     url(r'^projects/(?P<projectname>\w+)/award/?$', 'gamification.core.views.award', name='award'),
     url(r'^projects/(?P<projectname>\w+)/points/?$', user_project_points_list),
     url(r'^projects/(?P<projectname>\w+)/points/?format=(?P<rendertype>\w+)?$', user_project_points_list),
+    url(r'^projects/(?P<projectname>\w+)/total/?$', user_points),
     url(r'^projects/(?P<projectname>\w+)/badges/?$', user_project_badges_list),
     url(r'^projects/(?P<projectname>\w+)/badges/?format=(?P<rendertype>\w+)?$', user_project_badges_list),
 

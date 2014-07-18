@@ -36,7 +36,9 @@ from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render, get_object_or_404
 import json
 from gamification.badges.utils import project_badge_count
-from gamification.core.utils import badge_count,top_n_badge_winners,user_project_badge_count, top_n_project_badge_winners, project_badge_awards
+from gamification.core.utils import badge_count,top_n_badge_winners,user_project_badge_count, top_n_project_badge_winners,\
+project_badge_awards, users_project_points
+
 from gamification.core.models import Project
 from gamification.core.forms import AwardForm
 from gamification.core.serializers import ProjectSerializer, PointsSerializer
@@ -268,6 +270,15 @@ def user_points_list(request,username):
 
     #JSON Renderer
     return Response(queryset)
+
+@api_view(('GET',))
+def user_points(request,username,projectname):
+    user = get_object_or_404(User, username=username)
+    project = get_object_or_404(Project, name=projectname)
+    points = users_project_points(user,project)
+    data =  {'user':user.username, 'project':project.name, 'points':points}
+
+    return Response(data)
 
 
 @api_view(('GET',))

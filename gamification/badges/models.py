@@ -61,7 +61,7 @@ class ProjectBadge(models.Model):
     name = models.CharField(max_length=255)    
     description = models.TextField()
     created = models.DateTimeField(default=datetime.now)
-    awardLevel = models.IntegerField(default=1000)
+    awardLevel = models.IntegerField(default=1)
     multipleAwards = models.BooleanField(default=True)
 
     @property
