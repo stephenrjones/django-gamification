@@ -34,6 +34,7 @@ from gamification.events.state import State
 from gamification.badges.models import ProjectBadge, ProjectBadgeToUser
 from intellect.Intellect import Intellect
 import json
+import logging, sys
 
 # For debug
 from datetime import datetime
@@ -117,6 +118,12 @@ def handle_event(request, *args, **kwargs):
 
         #####################################################################
 
+        logger = logging.getLogger('intellect')
+        logger.setLevel(logging.DEBUG)
+        consoleHandler = logging.StreamHandler()
+        consoleHandler.setFormatter(logging.Formatter('%(asctime)s %(name)-12s %(levelname)-8s%(message)s'))
+        logger.addHandler(consoleHandler)
+
         # get badges for this project, then for each badge run through its policies
         project_badges = ProjectBadge.objects.filter(project=project)
 
@@ -135,6 +142,7 @@ def handle_event(request, *args, **kwargs):
                         e.state = state
                         e.current_event = current_event.id
                         intellect.learn(e)
+                    # import pdb; pdb.set_trace()
                     intellect.reason()
                 except ObjectDoesNotExist:
                     print 'state policy not found'

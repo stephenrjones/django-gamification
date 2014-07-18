@@ -124,6 +124,20 @@ def top_n_badge_project_winners(pbtu_qs,pb_id,num):
     topn = pbtu_qs.filter(projectbadge__id=pb_id).values('user__username').annotate(awarded=models.Count('user__username')).order_by('-awarded')[:num]
     return list(topn)
 
+def users_project_points(user,project):
+    """
+    Find out a user's total points won on project, factoring in weighted values of badges
+    """
+    total = ProjectBadge.objects.filter(user=user,project=project).aggregate(models.Sum('awardLevel'))
+    return total['awardLevel__sum']
+
+def users_total_points(user):
+    """
+    Find out a user's points from all projects
+    """
+    total = ProjectBadge.objects.filter(user=user).aggregate(models.Sum('awardLevel'))
+    return total['awardLevel__sum']
+
 def user_project_badge_count(user,project):
     """
     Given a user or queryset of users, this returns the badge
