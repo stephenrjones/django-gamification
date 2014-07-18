@@ -33,7 +33,27 @@
         });
     </script>
 {% else %}
+
+    {% if project.project_closing_date %}
+    <script src="{{ STATIC_URL }}js/TimeCircles/TimeCircles.js"></script>
+    <link rel="stylesheet" href="{{ STATIC_URL }}js/TimeCircles/TimeCircles.css">
+    {%  endif %}
+
+    {% if project.visual_theme %}
+    <link rel="stylesheet" href="{{ STATIC_URL }}themes/{{ project.visual_theme }}/style.css">
+    {% endif %}
+
     <style>
+        {%  if project.background_image %}
+        html {
+            background: url({{ STATIC_URL }}{{ project.background_image }}) no-repeat center center fixed;
+            -webkit-background-size: cover;
+            -moz-background-size: cover;
+            -o-background-size: cover;
+            background-size: cover;
+        }
+        {% endif %}
+
         div.row {
             margin-left: 0px;
         }
@@ -71,6 +91,10 @@
         #header_title {
             margin-bottom: 20px;
         }
+        .tab-content{
+            max-height: 650px;
+            overflow: scroll;
+        }
     </style>
     <script>
         var project_info = {};
@@ -89,6 +113,12 @@
                     $item.text('Awarded '+newtime);
                 }
             });
+
+            {% if project.project_closing_date %}
+            $(".countdown_clock").TimeCircles();
+            {% endif %}
+
+
         });
     </script>
 
@@ -99,7 +129,13 @@
     </ul>
     <div id="my-tab-content" class="tab-content">
         <div class="tab-pane active" id="leader_board">
-            <h1>Leader Board</h1>
+
+                {# -- Coundown clock -- #}
+                {% if project.project_closing_date %}
+                <div style="font-size: 20px;font-weight: bold;">
+                    Project closes in: <div class="countdown_clock" data-date="{{ project.project_closing_date|date:"Y-m-d" }} {{ project.project_closing_date|time:"H:i:s" }}" style="height:100px"></div>
+                </div>
+                {% endif %}
 
                 {# -- Leader Board -- #}
                 {% for awardee,badges in badge_awards %}
@@ -114,7 +150,6 @@
 
         </div>
         <div class="tab-pane" id="badge_leaders">
-            <h1>Badge Leaders</h1>
 
                 {# -- Top Badge Winners -- #}
                 {% for top_badge in top_n_badges %}
@@ -141,7 +176,6 @@
 
         </div>
         <div class="tab-pane" id="badge_list">
-            <h1>Badge List</h1>
 
                 {# -- All Badge Recipients -- #}
                 {% for awardee,badges in badge_awards %}
