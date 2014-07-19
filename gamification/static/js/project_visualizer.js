@@ -35,10 +35,10 @@ project_visualizer.trackProgress = function() {
 
 project_visualizer.imagesLoaded = function() {
     //Run after all images are ready
-    project_visualizer.draw_badges();
+    project_visualizer.draw_canoe_and_oars();
 };
 
-project_visualizer.draw_badges = function(){
+project_visualizer.draw_canoe_and_oars = function(){
     //Shortcuts
     var ctx = project_visualizer.ctx;
     var canoe = project_visualizer.loadedArray[0];
@@ -114,6 +114,13 @@ project_visualizer.draw_badges = function(){
     }
 
     ctx.drawImage(canoe,50,100,canoe_width,canoe_height);
+
+    ctx.translate(canoe_width+30, 140);
+    ctx.fillStyle = "white";
+    ctx.rotate(-Math.PI/16);
+    ctx.textAlign = "right";
+    ctx.font="bold 16px Verdana";
+    ctx.fillText(project_info.name, 0, 0);
 
 };
 
