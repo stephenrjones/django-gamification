@@ -34,10 +34,14 @@
     </script>
 {% else %}
 
+    {% if project.visual_theme == "camping" %}
+    <script src="{{ STATIC_URL }}js/project_visualizer.js"></script>
+    {%  endif %}
     {% if project.project_closing_date %}
     <script src="{{ STATIC_URL }}js/TimeCircles/TimeCircles.js"></script>
     <link rel="stylesheet" href="{{ STATIC_URL }}js/TimeCircles/TimeCircles.css">
     {%  endif %}
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/project_list.css">
 
     {% if project.visual_theme %}
     <link rel="stylesheet" href="{{ STATIC_URL }}themes/{{ project.visual_theme }}/style.css">
@@ -53,48 +57,6 @@
             background-size: cover;
         }
         {% endif %}
-
-        div.row {
-            margin-left: 0px;
-        }
-        .badge-row.leader {
-            padding: 0px; line-height: 1em;
-        }
-        .badge-row.leader img{
-            padding: 0px;width: 24px;vertical-align: baseline;
-        }
-
-        .badge-row {
-            padding:5px; border:1px solid gray
-        }
-        .badge-row h4 {
-            margin: 0px 0px 5px 0px;
-        }
-        .badge-row:nth-child(even) {
-            background-color: lightcyan;
-        }
-        .badge-row:nth-child(odd) {
-            background-color: lightyellow;
-        }
-        .badge-row span.dtg {
-            display: inline; padding: 0px;
-        }
-        .badge-row span.awardee {
-            display: inline; padding: 0px; width: 150px;
-        }
-        .badge-row span {
-            display: inline-block; vertical-align: top; padding:10px;
-        }
-        #header_title h1{
-            margin:0px;
-        }
-        #header_title {
-            margin-bottom: 20px;
-        }
-        .tab-content{
-            max-height: 650px;
-            overflow: scroll;
-        }
     </style>
     <script>
         var project_info = {};
@@ -102,6 +64,9 @@
         project_info.description = '{{ project.description|default:"" }}';
         project_info.name = '{{ project.name|default:"" }}';
         project_info.id = '{{ project.id }}';
+        {% autoescape off %}
+        project_info.badge_json = {{ badge_awards_json|default:"''" }};
+        {% endautoescape %}
 
         $(document).ready(function(){
             $('.dtg').each(function(){
@@ -118,23 +83,26 @@
             $(".countdown_clock").TimeCircles();
             {% endif %}
 
+            //Highlight the first tab
+            $('.nav-tabs li').first().addClass('active');
+            $('.tab-content > .tab-pane').first().addClass('active');
 
         });
     </script>
 
     <ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
-        <li class="active"><a href="#leader_board" data-toggle="tab">Leader board</a></li>
+        <li><a href="#leader_board" data-toggle="tab">Leader board</a></li>
         <li><a href="#badge_leaders" data-toggle="tab">Badge Leaders</a></li>
         <li><a href="#badge_list" data-toggle="tab">Badge List</a></li>
+        {% if project.project_closing_date %}
+        <li><a href="#data_graph" data-toggle="tab">Project Data</a></li>
+        {%  endif %}
     </ul>
     <div id="my-tab-content" class="tab-content">
-        <div class="tab-pane active" id="leader_board">
+        <div class="tab-pane" id="leader_board">
 
-                {# -- Coundown clock -- #}
-                {% if project.project_closing_date %}
-                <div style="font-size: 20px;font-weight: bold;">
-                    Project closes in: <div class="countdown_clock" data-date="{{ project.project_closing_date|date:"Y-m-d" }} {{ project.project_closing_date|time:"H:i:s" }}" style="height:100px"></div>
-                </div>
+                {% if project.visual_theme == "camping" %}
+                <canvas width="1000" height="220" id="badge_data_canvas">This graph doesn't show on your browser</canvas>
                 {% endif %}
 
                 {# -- Leader Board -- #}
@@ -191,6 +159,16 @@
                 {% endfor %}
 
         </div>
+
+        {% if project.project_closing_date %}
+        <div class="tab-pane" id="data_graph">
+                {# -- Coundown clock -- #}
+                <div style="font-size: 20px;font-weight: bold;">
+                    Project closes in: <div class="countdown_clock" data-date="{{ project.project_closing_date|date:"Y-m-d" }} {{ project.project_closing_date|time:"H:i:s" }}" style="height:100px"></div>
+                </div>
+        </div>
+        {% endif %}
+
     </div>
 
     {%  if admin %}

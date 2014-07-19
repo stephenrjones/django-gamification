@@ -113,6 +113,7 @@ class ProjectListView(ListView):
 
         context['top_n_badges'] = top_n_badge_winners(projects,5)
         context['badge_awards'] = project_badge_awards(projects)
+        context['badge_awards_json'] = json.dumps(context['badge_awards'])
         context['project'] = projects[0]
         context['code'] = phrase
         context['admin'] = self.request.user.is_superuser or self.request.user.groups.filter(name='admin_group').count() > 0
