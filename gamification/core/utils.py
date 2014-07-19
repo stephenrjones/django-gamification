@@ -88,6 +88,12 @@ def project_badge_awards(project):
     #Sort by number of badges in reverse order
     return sorted(groups.iteritems(),key=lambda (k,v): len(v),reverse=True)
 
+def get_files_in_dir(mypath):
+    from os import listdir
+    from os.path import isfile, join
+    return [ f for f in listdir(mypath) if isfile(join(mypath,f)) ]
+
+
 def top_n_badge_winners(project, num=3):
     """
     Given a particular project, this returns the top n badge

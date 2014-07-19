@@ -37,7 +37,7 @@ from django.shortcuts import render, get_object_or_404
 import json
 from gamification.badges.utils import project_badge_count
 from gamification.core.utils import badge_count,top_n_badge_winners,user_project_badge_count, top_n_project_badge_winners,\
-project_badge_awards, users_project_points
+project_badge_awards, users_project_points, get_files_in_dir
 
 from gamification.core.models import Project
 from gamification.core.forms import AwardForm
@@ -116,6 +116,17 @@ class ProjectListView(ListView):
         context['badge_awards_json'] = json.dumps(context['badge_awards'])
         context['project'] = projects[0]
         context['code'] = phrase
+        if projects[0].visual_theme:
+            try:
+                files = get_files_in_dir("gamification/static/themes/" + projects[0].visual_theme)
+                js_files = [ f for f in files if f.endswith(".js") ]
+
+                context['theme_files'] = json.dumps(js_files, ensure_ascii=False)
+                context['theme_files_js'] = [ f for f in files if f.endswith(".js") ]
+                context['theme_files_css'] = [ f for f in files if f.endswith(".css") ]
+            except Exception, e:
+                context['theme_files_error'] = str(e)
+
         context['admin'] = self.request.user.is_superuser or self.request.user.groups.filter(name='admin_group').count() > 0
         return context
 

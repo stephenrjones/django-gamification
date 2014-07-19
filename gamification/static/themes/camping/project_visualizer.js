@@ -35,10 +35,11 @@ project_visualizer.trackProgress = function() {
 
 project_visualizer.imagesLoaded = function() {
     //Run after all images are ready
-    project_visualizer.draw_canoe_and_oars();
+    //TODO: Pass a list of visualization types and call appropriately with proper data
+    project_visualizer.draw_canoe_and_oars(project_info.badge_json || []);
 };
 
-project_visualizer.draw_canoe_and_oars = function(){
+project_visualizer.draw_canoe_and_oars = function(badge_info){
     //Shortcuts
     var ctx = project_visualizer.ctx;
     var canoe = project_visualizer.loadedArray[0];
@@ -55,7 +56,7 @@ project_visualizer.draw_canoe_and_oars = function(){
     var canoe_height = 200 / (1460/canoe_width);
     var oar_width = 70;
     var num_oars = 20;
-    if (project_info.badge_json.length < num_oars) num_oars = project_info.badge_json.length;
+    if (badge_info && badge_info.length < num_oars) num_oars = badge_info.length;
 
     var oar_spacing = parseInt((canoe_width-canvas_spacing-canoe_spacing_right-(canoe_spacing/2)) / (num_oars-1));
     ctx.font="bold 12px Verdana";
@@ -63,7 +64,7 @@ project_visualizer.draw_canoe_and_oars = function(){
     var badges_max=0;
     var badges_min=100000000;
     for (var i=0;i<num_oars;i++){
-        var badge = project_info.badge_json[i];
+        var badge = badge_info[i];
         var awards = badge[1].length;
         if (awards>badges_max) badges_max=awards;
         if (awards<badges_min) badges_min=awards
@@ -71,7 +72,7 @@ project_visualizer.draw_canoe_and_oars = function(){
 
     //Draw the oars
     for (var i=0;i<num_oars;i++){
-        var badge = project_info.badge_json[i];
+        var badge = badge_info[i];
         var awards = badge[1].length;
         var name = badge[0];
 

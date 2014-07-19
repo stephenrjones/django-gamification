@@ -34,18 +34,19 @@
     </script>
 {% else %}
 
-    {% if project.visual_theme == "camping" %}
-    <script src="{{ STATIC_URL }}js/project_visualizer.js"></script>
-    {%  endif %}
+    {% for file in theme_files_js %}
+    <script src="{{ STATIC_URL }}themes/{{ project.visual_theme }}/{{ file }}"></script>
+    {% endfor %}
+
     {% if project.project_closing_date %}
     <script src="{{ STATIC_URL }}js/TimeCircles/TimeCircles.js"></script>
     <link rel="stylesheet" href="{{ STATIC_URL }}js/TimeCircles/TimeCircles.css">
     {%  endif %}
     <link rel="stylesheet" href="{{ STATIC_URL }}css/project_list.css">
 
-    {% if project.visual_theme %}
-    <link rel="stylesheet" href="{{ STATIC_URL }}themes/{{ project.visual_theme }}/style.css">
-    {% endif %}
+    {% for file in theme_files_css %}
+    <link rel="stylesheet" href="{{ STATIC_URL }}themes/{{ project.visual_theme }}/{{ file }}">
+    {% endfor %}
 
     <style>
         {%  if project.background_image %}
@@ -66,6 +67,7 @@
         project_info.id = '{{ project.id }}';
         {% autoescape off %}
         project_info.badge_json = {{ badge_awards_json|default:"''" }};
+        project_info.theme_files = {{ theme_files|safe|default:"''" }};
         {% endautoescape %}
 
         $(document).ready(function(){
