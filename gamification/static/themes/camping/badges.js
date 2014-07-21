@@ -1,5 +1,7 @@
 var badges = {$holder:null};
 badges.imageUrlPrefix = "/static/";
+badges.dontShowBottomPercent = 0.4;
+badges.dontHighlightBottom = true;
 
 badges.init = function(){
     //Initialization
@@ -27,7 +29,11 @@ badges.drawBadgesTable = function(badges_data) {
     var maxBadges = 0;
     var minBadges = 100000000;
 
+    var usersCount = badges_data.length;
+    var numToShow = parseInt(usersCount * (1-badges.dontShowBottomPercent));
+
     var badges_data_new = badges.groupBadges(badges_data);
+    badges_data_new = _.first(badges_data_new,numToShow);
 
     var $person_badge_holders = [];
     var $person_badge_holders_text = [];
@@ -100,35 +106,49 @@ badges.drawBadgesTable = function(badges_data) {
 
 
     _.each(badges_data,function(awardee,i){
-        var badgeCount = awardee[1].length;
-        var name = _.str.capitalize(badges.nameFormat(awardee[0]));
-        var bgColor = "#eff";
-        var badge = "";
+        if (i<numToShow){
+            var badgeCount = awardee[1].length;
+            var name = _.str.capitalize(badges.nameFormat(awardee[0]));
+            var bgColor = "#eff";
+            var badge = "";
 
-        if (badgeCount == maxBadges){
-            bgColor='#F1F7CC';
-            badge="Gold";
-        } else if (badgeCount == maxSecondBadges){
-            bgColor='#F6F9F9';
-            badge="Silver";
-        } else if (badgeCount == maxThirdBadges){
-            bgColor='#E5D8CC';
-            badge="Copper";
-        } else if (badgeCount == minBadges){
-            bgColor='#F1CCCC';
-            badge="Last";
+            if (badgeCount == maxBadges){
+                bgColor='#F1F7CC';
+                badge="Gold";
+            } else if (badgeCount == maxSecondBadges){
+                bgColor='#F6F9F9';
+                badge="Silver";
+            } else if (badgeCount == maxThirdBadges){
+                bgColor='#E5D8CC';
+                badge="Copper";
+            } else if (!badges.dontHighlightBottom && badgeCount == minBadges){
+                bgColor='#F1CCCC';
+                badge="Last";
+            }
+
+            var title = name + " ("+badgeCount;
+            if (badge) title = title + " - "+badge;
+            title = title+")";
+
+            $person_badge_holders[i]
+                .css({backgroundColor:bgColor});
+
+            $person_badge_holders_text[i]
+                .text(title);
         }
-
-        var title = name + " ("+badgeCount;
-        if (badge) title = title + " - "+badge;
-        title = title+")";
-
-        $person_badge_holders[i]
-            .css({backgroundColor:bgColor});
-
-        $person_badge_holders_text[i]
-            .text(title);
     });
+    if (numToShow<usersCount){
+        var $person = $('<span>')
+            .addClass('personHeader')
+            .appendTo(badges.$holder);
+
+        var numLeft = usersCount-numToShow;
+        $('<div>')
+            .addClass('personHeaderText')
+            .html('Additional '+numLeft+'<br/>awardees not shown<br/>...')
+            .appendTo($person);
+
+    }
 };
 
 badges.groupBadges = function(badges_data){

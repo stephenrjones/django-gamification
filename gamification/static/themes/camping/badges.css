@@ -5,6 +5,7 @@
     background-color: #eff;
     border-image: url(corner_border_cyber_blue.png) 12% 8% 8% 8% round;
     border-width: 14px;
+    vertical-align: top;
 
 }
 .personHeaderText {
