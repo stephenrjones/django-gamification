@@ -1,6 +1,6 @@
 var badges = {$holder:null};
 badges.imageUrlPrefix = "/static/";
-badges.dontShowBottomPercent = 0.4;
+badges.dontShowBottomPercent = 0.0;
 badges.dontHighlightBottom = true;
 
 badges.init = function(){
