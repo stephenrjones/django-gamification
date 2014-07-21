@@ -60,9 +60,9 @@ badges.drawBadgesTable = function(badges_data) {
                 .popover({
                     title: name,
                     html : true,
-                    content:'<b>Badge:</b><br/><img src="'+url+'" width:100></img>',
+                    content:'<b>Badge: '+name+'</b><br/><img src="'+url+'" width:100></img>',
                     trigger:'hover',
-                    container:'body',
+                    container:'#my-tab-content',
                     placement:'auto'
                 })
                 .appendTo($person);
