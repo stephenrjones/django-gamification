@@ -34,6 +34,7 @@
     </script>
 {% else %}
 
+    <script src="{{ STATIC_URL }}js/maths.js"></script>
     {% for file in theme_files_js %}
     <script src="{{ STATIC_URL }}themes/{{ project.visual_theme }}/{{ file }}"></script>
     {% endfor %}
@@ -103,11 +104,8 @@
     <div id="my-tab-content" class="tab-content">
         <div class="tab-pane" id="leader_board">
 
-                {% if project.visual_theme == "camping" %}
-                <canvas width="1000" height="220" id="badge_data_canvas">This graph doesn't show on your browser</canvas>
-                {% endif %}
-
-                {# -- Leader Board -- #}
+            {# -- Leader Board -- #}
+            <div id="leader_board_table">
                 {% for awardee,badges in badge_awards %}
                 <div class="row badge-row leader">
                     <span style="width: 80px;"><b>{{ awardee|capfirst }}</b></span>
@@ -117,6 +115,7 @@
                     {% endfor %}
                 </div>
                 {% endfor %}
+            </div>
 
         </div>
         <div class="tab-pane" id="badge_leaders">
