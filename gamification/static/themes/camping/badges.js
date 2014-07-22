@@ -317,21 +317,28 @@ badges.drawBadgesCardTable = function(badges_data) {
             var left = 10;
             var right = 155;
             var fontSize = 0;
-            var top = 0;
+            var top = 19;
             if (pointCount > 1000) {
                 left += -2;
                 right += 0;
                 fontSize = 12;
-                top = 18;
+                top = 20;
             } else if (pointCount > 100) {
                 left += -6;
                 right += -3;
                 fontSize = 15;
-                top = 16;
+                top = 18;
             } else if (pointCount > 10) {
                 left += -9;
                 right += -5;
             }
+            $('<span>')
+                .addClass('personHeaderCardText personHeaderTextLeft')
+                .text('Points:')
+                .attr('title','Total Points Achieved')
+                .css({left:10, right:155, top:12, fontSize:'7px',textShadow:''})
+                .appendTo($person);
+
             var $points = $('<span>')
                 .addClass('personHeaderCardText personHeaderTextLeft')
                 .text(pointCount)
@@ -341,25 +348,33 @@ badges.drawBadgesCardTable = function(badges_data) {
             if (fontSize) $points.css('fontSize',fontSize);
             if (top) $points.css('top',top);
 
+
             //Position/tweak right number
             left = 155;
             right = 10;
             fontSize = 0;
-            top = 0;
+            top = 19;
             if (pointCount > 1000) {
                 left += 0;
                 right += -2;
                 fontSize = 12;
-                top = 18;
+                top = 20;
             } else if (pointCount > 100) {
                 left += -3;
                 right += -6;
                 fontSize = 15;
-                top = 16;
+                top = 18;
             } else if (pointCount > 10) {
                 left += -5;
                 right += -9;
             }
+            $('<span>')
+                .addClass('personHeaderCardText personHeaderTextRight')
+                .text('Badges:')
+                .attr('title','Total Points Achieved')
+                .css({left:155, right:10, top:12, fontSize:'7px',textShadow:''})
+                .appendTo($person);
+
             var $badges = $('<span>')
                 .addClass('personHeaderCardText personHeaderTextRight')
                 .text(badgeCount)
