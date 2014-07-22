@@ -110,7 +110,7 @@ class ProjectBadgeToUser(models.Model):
         verbose_name_plural = "Awarded Badges"
 
 class BadgeSettings(models.Model):
-    awardLevel = models.IntegerField(default=1000)
+    awardLevel = models.IntegerField(default=1)
     multipleAwards = models.BooleanField(default=True)
 
     class Meta:

@@ -61,26 +61,34 @@ paddles.draw_canoe_and_oars = function(badge_info){
     var oar_width = 70;
     var num_oars = 20;
     if (badge_info && badge_info.length < num_oars) num_oars = badge_info.length;
+    if (num_oars < 2) num_oars = 2;
 
     var oar_spacing = parseInt((canoe_width-canvas_spacing-canoe_spacing_right-(canoe_spacing/2)) / (num_oars-1));
     ctx.font="bold 12px Verdana";
 
     var badges_max=0;
     var badges_min=100000000;
+    var points_max=0;
+    var points_min=100000000;
+
     for (var i=0;i<num_oars;i++){
         var badge = badge_info[i];
         var awards = badge[1].length;
+        var points = badge[2] || parseInt(awards*1.5) || 1;
         if (awards>badges_max) badges_max=awards;
-        if (awards<badges_min) badges_min=awards
+        if (awards<badges_min) badges_min=awards;
+        if (points>points_max) points_max=points;
+        if (points<points_min) points_min=points;
     }
 
     //Draw the oars
     for (var i=0;i<num_oars;i++){
         var badge = badge_info[i];
         var awards = badge[1].length;
-        var name = badge[0];
+        var points = badge[2] || parseInt(awards*1.5) || 1;
+        var name = paddles.nameFormat(badge[0] || "Unknown");
 
-        var oar_size = maths.sizeFromAmountRange(oar_width*0.75,oar_width*1.8,awards,badges_min,badges_max);
+        var oar_size = maths.sizeFromAmountRange(oar_width*0.75,oar_width*1.8,points,points_min,points_max);
 
         //Draw the Oar
         var oar_x = canvas_spacing+canoe_spacing+(i*oar_spacing);
@@ -97,10 +105,10 @@ paddles.draw_canoe_and_oars = function(badge_info){
 
 
         //Draw Meatball
-        var mb_spacing = maths.sizeFromAmountRange(15,25,awards,badges_min,badges_max);
+        var mb_spacing = maths.sizeFromAmountRange(15,25,points,points_min,points_max);
         ctx.beginPath();
         ctx.arc(-mb_spacing, -3, mb_spacing/2, 0, 2 * Math.PI, false);
-        var bgColor = maths.colorBlendFromAmountRange('#00ff00','#660000',awards,badges_min,badges_max);
+        var bgColor = maths.colorBlendFromAmountRange('#00ff00','#660000',points,points_min,points_max);
         ctx.fillStyle = bgColor;
         ctx.fill();
         ctx.lineWidth = 1;
@@ -111,7 +119,7 @@ paddles.draw_canoe_and_oars = function(badge_info){
         ctx.fillStyle = maths.idealTextColor(bgColor);
         ctx.textAlign = "center";
         ctx.font="bold "+(1+mb_spacing/2)+"px Verdana";
-        var meatball =  awards;
+        var meatball =  points;
         ctx.fillText(meatball, -mb_spacing, 1);
 
         ctx.restore();
@@ -127,6 +135,10 @@ paddles.draw_canoe_and_oars = function(badge_info){
     ctx.font="bold 16px Verdana";
     ctx.fillText(project_info.name, 0, 0);
 
+};
+paddles.nameFormat = function(name){
+    var lenName = name.length;
+    return name.substring(0,1).toUpperCase() + name.substring(1,lenName-1)+ name.substring(lenName-1,lenName).toUpperCase();
 };
 
 $(document).ready(paddles.init);

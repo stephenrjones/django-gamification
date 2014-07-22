@@ -122,13 +122,13 @@
         <div class="tab-pane" id="badge_leaders">
 
                 {# -- Top Badge Winners -- #}
-                {% for top_badge in top_n_badges %}
+                {% for top_badge in top_n_badges|dictsortreversed:"awardLevel" %}
                 <div class="row badge-row">
                     <span style="width: 100px;">
                         <img src="/static/{{  top_badge.badge__icon|default:'badge_icons/default.png' }}" width="90"/>
                     </span>
                     <span style="width: 500px;">
-                        <b>{{ top_badge.name|title }}</b><br/>
+                        <b>{{ top_badge.name|title }} ({{ top_badge.awardLevel }} point{{ top_badge.awardLevel|pluralize }})</b><br/>
                         <i>{{ top_badge.description|capfirst }}</i>
                     </span>
                     <span>
@@ -148,13 +148,13 @@
         <div class="tab-pane" id="badge_list">
 
                 {# -- All Badge Recipients -- #}
-                {% for awardee,badges in badge_awards %}
+                {% for awardee,badges,score in badge_awards %}
                 <div class="row badge-row">
                     <span style="width: 100px;"><b>{{ awardee }}</b></span>
                     <span>
-                        <b>{{ badges|length }} Badge{{ badges|pluralize }}:</b>
+                        <b>{{ badges|length }} Badge{{ badges|pluralize }} - {{ score }} point{{ score|pluralize }}:</b>
                         {% for badge in badges %}
-                            <li><img src="/static/{{ badge.icon }}" style="width: 20px"/> <span class="awardee"><b>{{ badge.badge|title }}</b></span>: <span class="dtg">{{ badge.date }}</span></li>
+                            <li><img src="/static/{{ badge.icon }}" style="width: 20px"/> <span class="awardee"><b>{{ badge.badge|title }}</b></span>: {{ badge.points }} point{{ badge.points|pluralize }} - <span class="dtg">{{ badge.date }}</span></li>
                         {% endfor %}
                     </span>
                 </div>

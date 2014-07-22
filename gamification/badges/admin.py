@@ -11,8 +11,8 @@ class BadgeAdmin(admin.ModelAdmin):
     
     
 class ProjectBadgeAdmin(admin.ModelAdmin):
-    fields = ('name','description','project','badge')
-    list_display = ('name', 'description')
+    fields = ('name','description','project','badge','awardLevel','multipleAwards')
+    list_display = ('name','description','awardLevel')
 
 class BadgeSettingsAdmin(admin.ModelAdmin):
     fields = ('awardLevel','multipleAwards')

@@ -169,6 +169,11 @@ badges.drawBadgesCardTable = function(badges_data) {
     var maxBadges = 0;
     var minBadges = 100000000;
 
+    var totalPoints = 0;
+    var maxPoints = 0;
+    var minPoints = 100000000;
+
+
     var usersCount = badges_data.length;
     var numToShow = parseInt(usersCount * (1-badges.dontShowBottomPercent));
 
@@ -180,6 +185,7 @@ badges.drawBadgesCardTable = function(badges_data) {
 
     _.each(badges_data_new,function(awardee){
         var badgeCount = 0;
+        var pointCount = awardee[2] || awardee[1].length || 0;
         var $person = $('<span>')
             .addClass('personHeaderCard')
             .appendTo(badges.$holder);
@@ -238,43 +244,57 @@ badges.drawBadgesCardTable = function(badges_data) {
         totalBadges += badgeCount;
         if (badgeCount < minBadges) minBadges = badgeCount;
         if (badgeCount > maxBadges) maxBadges = badgeCount;
+
+        totalPoints += pointCount;
+        if (pointCount < minPoints) minPoints = pointCount;
+        if (pointCount > maxPoints) maxPoints = pointCount;
     });
 
+    //Find who's in 2nd+3rd place
     var maxSecondBadges=0;
+    var maxSecondPoints=0;
     _.each(badges_data,function(awardee){
         var badgeCount = awardee[1].length;
         if (badgeCount > maxSecondBadges && badgeCount!=maxBadges) maxSecondBadges = badgeCount;
+        var pointCount = awardee[2] || parseInt(badgeCount * 1.5) || 1;
+        if (pointCount > maxSecondPoints && pointCount!=maxPoints) maxSecondPoints = pointCount;
     });
-
     var maxThirdBadges=0;
+    var maxThirdPoints=0;
     _.each(badges_data,function(awardee){
         var badgeCount = awardee[1].length;
         if (badgeCount > maxThirdBadges && badgeCount!=maxBadges && badgeCount!=maxSecondBadges) maxThirdBadges = badgeCount;
+        var pointCount = awardee[2] || parseInt(badgeCount * 1.5) || 1;
+        if (pointCount > maxThirdPoints && pointCount!=maxPoints && pointCount!=maxSecondPoints) maxThirdPoints = pointCount;
     });
 
 
+    //Colorize each badge and apply the right style and text
     _.each(badges_data,function(awardee,i){
         if (i<numToShow){
             var badgeCount = awardee[1].length;
-            var pointCount = parseInt(badgeCount * 1.5);
+            var pointCount = awardee[2] || parseInt(badgeCount * 1.5) || 1;
             var medalCount = _.toArray(_.groupBy(awardee[1],'badge')).length;
+
             var bgColor = "white";
             var badge = "";
-
-            if (badgeCount == maxBadges){
+            var place = "";
+            if (pointCount == maxPoints){
                 bgColor='gold';
                 badge="Gold";
-            } else if (badgeCount == maxSecondBadges){
-                bgColor='#F6F9F9';
+                place="1st";
+            } else if (pointCount == maxSecondPoints){
+                bgColor='#CCCCCC';
                 badge="Silver";
-            } else if (badgeCount == maxThirdBadges){
+                place="2nd";
+            } else if (pointCount == maxThirdPoints){
                 bgColor='#E5D8CC';
                 badge="Copper";
-            } else if (!badges.dontHighlightBottom && badgeCount == minBadges){
+                place="3rd";
+            } else if (!badges.dontHighlightBottom && pointCount == minPoints){
                 bgColor='#F1CCCC';
                 badge="Last";
             }
-
             var linesCSS = 'cardHeight100';
             if (medalCount > 12) linesCSS = 'cardHeight300';
             if (medalCount > 8) linesCSS = 'cardHeight200';
@@ -288,18 +308,66 @@ badges.drawBadgesCardTable = function(badges_data) {
                     $person_badge_holders_text[i]
                         .css('color',bgColor);
             }
+            if (place) {
+                    $person_badge_holders_text[i]
+                        .attr('title',badge+' : '+place+' Place!');
+            }
 
-            $('<span>')
+            //Position/tweak left number
+            var left = 10;
+            var right = 155;
+            var fontSize = 0;
+            var top = 0;
+            if (pointCount > 1000) {
+                left += -2;
+                right += 0;
+                fontSize = 12;
+                top = 18;
+            } else if (pointCount > 100) {
+                left += -6;
+                right += -3;
+                fontSize = 15;
+                top = 16;
+            } else if (pointCount > 10) {
+                left += -9;
+                right += -5;
+            }
+            var $points = $('<span>')
                 .addClass('personHeaderCardText personHeaderTextLeft')
-                .text(badgeCount)
-                .attr('title','Badges Achieved')
-                .appendTo($person);
-
-            $('<span>')
-                .addClass('personHeaderCardText personHeaderTextRight')
                 .text(pointCount)
                 .attr('title','Total Points Achieved')
+                .css({left:left, right:right})
                 .appendTo($person);
+            if (fontSize) $points.css('fontSize',fontSize);
+            if (top) $points.css('top',top);
+
+            //Position/tweak right number
+            left = 155;
+            right = 10;
+            fontSize = 0;
+            top = 0;
+            if (pointCount > 1000) {
+                left += 0;
+                right += -2;
+                fontSize = 12;
+                top = 18;
+            } else if (pointCount > 100) {
+                left += -3;
+                right += -6;
+                fontSize = 15;
+                top = 16;
+            } else if (pointCount > 10) {
+                left += -5;
+                right += -9;
+            }
+            var $badges = $('<span>')
+                .addClass('personHeaderCardText personHeaderTextRight')
+                .text(badgeCount)
+                .attr('title','Badges Achieved')
+                .css({left:left, right:right})
+                .appendTo($person);
+            if (fontSize) $badges.css('fontSize',fontSize);
+            if (top) $badges.css('top',top);
 
         }
     });

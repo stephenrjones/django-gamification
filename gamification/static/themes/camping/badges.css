@@ -32,6 +32,7 @@
 }
 .personHeaderCardText {
     font-family:Arial;
+    cursor: cell;
     padding: 2px;
     font-size:17px;
     color:white;

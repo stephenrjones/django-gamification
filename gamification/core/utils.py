@@ -81,7 +81,7 @@ def project_badge_awards(project):
     groups = defaultdict(list)
     scores = defaultdict(int)
     for obj in user_badges:
-        groups[obj['user__username']].append({'badge':str(obj['projectbadge__name']),'date':str(obj['created']),'icon':str(obj['projectbadge__badge__icon'])})
+        groups[obj['user__username']].append({'badge':str(obj['projectbadge__name']),'date':str(obj['created']),'icon':str(obj['projectbadge__badge__icon']),'points':str(obj['projectbadge__awardLevel'])})
         scores[obj['user__username']] += obj['projectbadge__awardLevel']
 
     #add scores
@@ -108,7 +108,7 @@ def top_n_badge_winners(project, num=3):
     """
     projectbadges = ProjectBadge.objects.filter(project=project)
     ids = projectbadges.values('id')
-    badges = projectbadges.values('id','name','description','badge__icon')
+    badges = projectbadges.values('id','name','description','badge__icon','awardLevel')
 
     pbtu = ProjectBadgeToUser.objects.filter(projectbadge__in=ids)
     badges = list(badges)
