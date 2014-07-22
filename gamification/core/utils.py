@@ -75,13 +75,13 @@ def project_badge_awards(project):
     """
     ids = ProjectBadge.objects.filter(project=project).values('id')
 
-    user_badges = ProjectBadgeToUser.objects.filter(projectbadge__in=ids).values('user__username', 'projectbadge__name', 'created', 'projectbadge__badge__icon', 'projectbadge__awardLevel')
+    user_badges = ProjectBadgeToUser.objects.filter(projectbadge__in=ids).values('user__username', 'projectbadge__name', 'created', 'projectbadge__badge__icon', 'projectbadge__awardLevel', 'projectbadge__tags')
 
     from collections import defaultdict
     groups = defaultdict(list)
     scores = defaultdict(int)
     for obj in user_badges:
-        groups[obj['user__username']].append({'badge':str(obj['projectbadge__name']),'date':str(obj['created']),'icon':str(obj['projectbadge__badge__icon']),'points':str(obj['projectbadge__awardLevel'])})
+        groups[obj['user__username']].append({'badge':str(obj['projectbadge__name']),'date':str(obj['created']),'icon':str(obj['projectbadge__badge__icon']),'tags':str(obj['projectbadge__tags']),'points':str(obj['projectbadge__awardLevel'])})
         scores[obj['user__username']] += obj['projectbadge__awardLevel']
 
     #add scores
