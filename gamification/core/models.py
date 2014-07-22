@@ -30,6 +30,7 @@ from django.utils.datastructures import SortedDict
 from django.db.models.signals import post_save
 from django.db import models
 from gamification.badges.models import ProjectBadge
+from jsonfield import JSONField
 
 
 TRUE_FALSE = [(0, 'False'), (1, 'True')]
@@ -90,6 +91,8 @@ class Project(ProjectBase):
     project_closing_date = models.DateTimeField(null=True, blank=True, help_text='Date that project "closes" with countdown shown on project page. Badges can still be added after this.')
     visual_theme = models.CharField(max_length=20, default="none", choices=THEMES, help_text='Visual Theme used to style the project page')
     background_image = models.ImageField(upload_to='badge_images', null=True, blank=True, help_text='Optional - Override theme background with this image')
+
+    properties = JSONField(null=True, blank=True, help_text='JSON key/value pairs associated with this object, e.g. {"badges_mode":"blue"}')
 
     query_token = models.CharField(max_length=200, null=True, blank=True, help_text='Token that must be entered by any server requesting data - not implemented yet.')
     allowed_api_hosts = models.TextField(null=True, blank=True, help_text='Comma-separated list of hosts (IPs or Hostnames) that can access this project via data requests - not implemented yet')

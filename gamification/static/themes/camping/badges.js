@@ -1,17 +1,25 @@
 var badges = {$holder:null};
 badges.imageUrlPrefix = "/static/";
-badges.dontShowBottomPercent = 0.0;
-badges.dontHighlightBottom = true;
 
 badges.init = function(){
     //Initialization
     badges.$holder = $("<div>");
 
+    if (!project_info.properties) project_info.properties = {};
+    badges.dontHighlightBottom = project_info.properties.dontHighlightBottom;
+    badges.dontShowBottomPercent = project_info.properties.dontShowBottomPercent;
+    if (typeof badges.dontHighlightBottom=="undefined") badges.dontHighlightBottom=true;
+    if (typeof badges.dontShowBottomPercent=="undefined") badges.dontShowBottomPercent=0.0;
+
     //Move leaderboards around
     $('#leader_board_table').appendTo('#data_graph');
     $('#leader_board').append(badges.$holder);
     if (typeof project_info!="unknown" && project_info.badge_json){
-        badges.drawBadgesTable(project_info.badge_json || []);
+        if (project_info.properties.badges_mode && project_info.properties.badges_mode=="cards"){
+            badges.drawBadgesCardTable(project_info.badge_json || []);
+        } else {
+            badges.drawBadgesTable(project_info.badge_json || []);
+        }
     }
 };
 badges.nameFormat = function(name){
@@ -145,6 +153,164 @@ badges.drawBadgesTable = function(badges_data) {
         var numLeft = usersCount-numToShow;
         $('<div>')
             .addClass('personHeaderText')
+            .html('Additional '+numLeft+'<br/>awardees not shown<br/>...')
+            .appendTo($person);
+
+    }
+};
+
+badges.drawBadgesCardTable = function(badges_data) {
+    var badgeWidth = 27;
+    var badgeTwoThirds = parseInt(badgeWidth*2/3);
+    var badgeHalf = parseInt(badgeWidth/2);
+    var badgeThird = parseInt(badgeWidth/3);
+
+    var totalBadges = 0;
+    var maxBadges = 0;
+    var minBadges = 100000000;
+
+    var usersCount = badges_data.length;
+    var numToShow = parseInt(usersCount * (1-badges.dontShowBottomPercent));
+
+    var badges_data_new = badges.groupBadges(badges_data);
+    badges_data_new = _.first(badges_data_new,numToShow);
+
+    var $person_badge_holders = [];
+    var $person_badge_holders_text = [];
+
+    _.each(badges_data_new,function(awardee){
+        var badgeCount = 0;
+        var $person = $('<span>')
+            .addClass('personHeaderCard')
+            .appendTo(badges.$holder);
+        $person_badge_holders.push($person);
+
+        var name = _.str.capitalize(badges.nameFormat(awardee[0]));
+        var $personText = $('<span>')
+            .addClass('personHeaderCardText')
+            .text(name)
+            .appendTo($person);
+        $person_badge_holders_text.push($personText);
+
+        var $badgeHolder = $('<div>')
+            .addClass('personCardBadgeHolder')
+            .appendTo($person);
+
+
+        _.each(awardee[1],function(badge){
+            var name = badge[0].badge || "Badge";
+            var url = badge[0].icon;
+            if (document.location.host == "") {
+                url = "../../" + url;
+            } else {
+                url = badges.imageUrlPrefix + url;
+            }
+
+            var $badge = $('<span>')
+                .addClass('personBadgeHolderCard')
+                .css({background:'url('+url+')',backgroundSize:'100% 100%', width:badgeWidth+'px',height:badgeWidth+'px',borderRadius:badgeThird+'px'})
+                .attr('title',name)
+                .popover({
+                    title: name,
+                    html : true,
+                    content:'<b>Badge: '+name+'</b><br/><img src="'+url+'" width:100></img>',
+                    trigger:'hover',
+                    container:'#my-tab-content',
+                    placement:'auto'
+                })
+                .attr('title',name)
+                .appendTo($badgeHolder);
+
+            $('<span>')
+                .addClass('personBadgeHolderMeatball')
+                .html('.')
+                .css({top:(badgeThird-1)+'px',left:badgeThird-1+'px',width:badgeHalf+4+'px',fontSize:badgeHalf+2+'px',borderRadius:badgeThird+'px'})
+                .appendTo($badge);
+
+            $('<span>')
+                .addClass('personBadgeHolderText')
+                .text(badge.length)
+                .css({top:(badgeThird)+'px',width:badgeWidth+'px',fontSize:badgeTwoThirds+'px'})
+                .appendTo($badge);
+
+            badgeCount+=badge.length;
+        });
+        totalBadges += badgeCount;
+        if (badgeCount < minBadges) minBadges = badgeCount;
+        if (badgeCount > maxBadges) maxBadges = badgeCount;
+    });
+
+    var maxSecondBadges=0;
+    _.each(badges_data,function(awardee){
+        var badgeCount = awardee[1].length;
+        if (badgeCount > maxSecondBadges && badgeCount!=maxBadges) maxSecondBadges = badgeCount;
+    });
+
+    var maxThirdBadges=0;
+    _.each(badges_data,function(awardee){
+        var badgeCount = awardee[1].length;
+        if (badgeCount > maxThirdBadges && badgeCount!=maxBadges && badgeCount!=maxSecondBadges) maxThirdBadges = badgeCount;
+    });
+
+
+    _.each(badges_data,function(awardee,i){
+        if (i<numToShow){
+            var badgeCount = awardee[1].length;
+            var pointCount = parseInt(badgeCount * 1.5);
+            var medalCount = _.toArray(_.groupBy(awardee[1],'badge')).length;
+            var bgColor = "white";
+            var badge = "";
+
+            if (badgeCount == maxBadges){
+                bgColor='gold';
+                badge="Gold";
+            } else if (badgeCount == maxSecondBadges){
+                bgColor='#F6F9F9';
+                badge="Silver";
+            } else if (badgeCount == maxThirdBadges){
+                bgColor='#E5D8CC';
+                badge="Copper";
+            } else if (!badges.dontHighlightBottom && badgeCount == minBadges){
+                bgColor='#F1CCCC';
+                badge="Last";
+            }
+
+            var linesCSS = 'cardHeight100';
+            if (medalCount > 12) linesCSS = 'cardHeight300';
+            if (medalCount > 8) linesCSS = 'cardHeight200';
+            if (medalCount > 4) linesCSS = 'cardHeight150';
+
+
+            var $person = $person_badge_holders[i]
+                .addClass(linesCSS);
+
+            if (bgColor) {
+                    $person_badge_holders_text[i]
+                        .css('color',bgColor);
+            }
+
+            $('<span>')
+                .addClass('personHeaderCardText personHeaderTextLeft')
+                .text(badgeCount)
+                .attr('title','Badges Achieved')
+                .appendTo($person);
+
+            $('<span>')
+                .addClass('personHeaderCardText personHeaderTextRight')
+                .text(pointCount)
+                .attr('title','Total Points Achieved')
+                .appendTo($person);
+
+        }
+    });
+    if (numToShow<usersCount){
+        var $person = $('<span>')
+            .addClass('personHeaderCard')
+            .appendTo(badges.$holder);
+
+        var numLeft = usersCount-numToShow;
+        $('<div>')
+            .addClass('personHeaderCardText')
             .html('Additional '+numLeft+'<br/>awardees not shown<br/>...')
             .appendTo($person);
 

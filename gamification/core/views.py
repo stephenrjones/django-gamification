@@ -115,6 +115,8 @@ class ProjectListView(ListView):
         context['badge_awards'] = project_badge_awards(projects)
         context['badge_awards_json'] = json.dumps(context['badge_awards'])
         context['project'] = projects[0]
+        context['properties_json'] = json.dumps(projects[0].properties or {})
+
         context['code'] = phrase
         if projects[0].visual_theme:
             try:

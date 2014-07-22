@@ -1,3 +1,80 @@
+.personHeaderCard {
+    display:inline-block;
+    margin:2px;
+    vertical-align: top;
+
+    width: 200px;
+    background-repeat: no-repeat;
+    position: relative;
+}
+
+.cardHeight100 {
+    background: url(card_wood_100.png);
+    background-size: 200px 100px;
+    height: 100px;
+}
+
+.cardHeight150 {
+    background: url(card_wood_150.png);
+    background-size: 200px 150px;
+    height: 150px;
+}
+
+.cardHeight200 {
+    background: url(card_wood_200.png);
+    background-size: 200px 200px;
+    height: 200px;
+}
+.cardHeight300 {
+    background: url(card_wood_300.png);
+    background-size: 300px 300px;
+    height: 300px;
+}
+.personHeaderCardText {
+    font-family:Arial;
+    padding: 2px;
+    font-size:17px;
+    color:white;
+    font-weight:bold;
+    text-shadow: 2px 2px #000000;
+    text-align:center;
+    top:15px;
+    left:0;
+    right:0;
+    margin-left:auto;
+    margin-right:auto;
+    /*left:50px;*/
+    position: absolute;
+}
+.personHeaderTextLeft {
+    left: 10px;
+    right: 155px;
+    color: yellow;
+}
+.personHeaderTextRight {
+    left: 155px;
+    right: 10px;
+    color: rgb(230, 254, 253);
+}
+
+.personCardBadgeHolder {
+    position: absolute;
+    top:52px;
+    left:18px;
+}
+.personBadgeHolderCard {
+    display:inline-block;
+    background-repeat: no-repeat;
+    padding:4px;
+    margin:3px;
+    /*margin-bottom: 0px;*/
+    margin-top: 1px;
+    position:relative;
+    /*border:1px solid black;*/
+}
+
+
+
 .personHeader {
     border:2px solid black;
     display:inline-block;

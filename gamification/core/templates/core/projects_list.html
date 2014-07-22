@@ -66,6 +66,7 @@
         project_info.description = '{{ project.description|default:"" }}';
         project_info.name = '{{ project.name|default:"" }}';
         project_info.id = '{{ project.id }}';
+        project_info.properties = {{ properties_json|safe }};
         {% autoescape off %}
         project_info.badge_json = {{ badge_awards_json|default:"''" }};
         project_info.theme_files = {{ theme_files|safe|default:"''" }};
