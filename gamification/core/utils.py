@@ -73,20 +73,23 @@ def project_badge_awards(project):
     """
     Given a particular project, this returns all badge winners.
     """
-    projectbadges = ProjectBadge.objects.filter(project=project)
+    ids = ProjectBadge.objects.filter(project=project).values('id')
 
-    ids = projectbadges.values('id')
-    pbtu = ProjectBadgeToUser.objects.filter(projectbadge__in=ids)
-
-    user_badges = pbtu.values('user__username', 'projectbadge__name', 'created', 'projectbadge__badge__icon')
+    user_badges = ProjectBadgeToUser.objects.filter(projectbadge__in=ids).values('user__username', 'projectbadge__name', 'created', 'projectbadge__badge__icon', 'projectbadge__awardLevel')
 
     from collections import defaultdict
     groups = defaultdict(list)
+    scores = defaultdict(int)
     for obj in user_badges:
         groups[obj['user__username']].append({'badge':str(obj['projectbadge__name']),'date':str(obj['created']),'icon':str(obj['projectbadge__badge__icon'])})
+        scores[obj['user__username']] += obj['projectbadge__awardLevel']
 
-    #Sort by number of badges in reverse order
-    return sorted(groups.iteritems(),key=lambda (k,v): len(v),reverse=True)
+    #add scores
+    items = groups.items()
+    for i in range(len(items)):
+        items[i] = items[i] + (scores[items[i][0]],)
+
+    return sorted(items, key=lambda rec: rec[2],reverse=True)
 
 def top_n_badge_winners(project, num=3):
     """

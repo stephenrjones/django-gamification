@@ -102,10 +102,10 @@
             <h1>Leader Board</h1>
 
                 {# -- Leader Board -- #}
-                {% for awardee,badges in badge_awards %}
+                {% for awardee,badges,score in badge_awards %}
                 <div class="row badge-row leader">
                     <span style="width: 80px;"><b>{{ awardee|capfirst }}</b></span>
-                    <span><b>{{ badges|length }}: </b></span>
+                    <span><b>{{ score }}: </b></span>
                     {% for badge in badges %}
                         <img src="/static/{{ badge.icon }}" title="{{ badge.badge }}"/>
                     {% endfor %}
