@@ -1,3 +1,13 @@
+.personJersey {
+    display:inline-block;
+    margin:4px;
+    vertical-align: top;
+
+    width: 210px;
+    height: 250px;
+    position: relative;
+}
+
 .personHeaderCard {
     display:inline-block;
     margin:2px;
