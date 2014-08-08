@@ -345,10 +345,11 @@ badges.drawBadgesCardTable = function(badges_data) {
                 bgColor='#F1CCCC';
                 badge="Last";
             }
-            var linesCSS = 'cardHeight100';
-            if (medalCount > 12) linesCSS = 'cardHeight300';
-            if (medalCount > 8) linesCSS = 'cardHeight200';
-            if (medalCount > 4) linesCSS = 'cardHeight150';
+            var linesCSS;
+            if (medalCount > 12) {linesCSS = 'cardHeight300';}
+            else if (medalCount > 8) {linesCSS = 'cardHeight200';}
+            else if (medalCount > 4) {linesCSS = 'cardHeight150';}
+            else {linesCSS = 'cardHeight100';}
 
 
             var $person = $person_badge_holders[i]
