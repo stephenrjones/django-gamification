@@ -313,18 +313,27 @@ def user_project_points_list(request,username,projectname,rendertype='html'):
 @renderer_classes((renderers.TemplateHTMLRenderer,renderers.JSONRenderer))
 def user_project_badges_list(request,username,projectname,rendertype='html'):
     user = get_object_or_404(User, username=username)
-    project = get_object_or_404(Project, name=projectname)
-    projbadges = ProjectBadge.objects.filter(project=project).order_by('badge__level')
-    prefix = 'https://' if request.is_secure() else 'http://'
-    url = prefix + request.get_host() + settings.STATIC_URL
 
-    #TODO: Find list of points for Leaderboard
-    badges = project_badge_count(user,project,projbadges,url)
+    project_names = projectname.split(',')
+    projects = Project.objects.filter(name__in=project_names)
 
-    pbtu = ProjectBadgeToUser.objects.filter(user__username=username,projectbadge__project__name=projectname)
     total_points = 0
-    for userbadge in pbtu:
-        total_points += userbadge.projectbadge.awardLevel
+    badges = []
+    for project in projects:
+
+        #Find all badges from the project
+        projbadges = ProjectBadge.objects.filter(project=project).order_by('badge__level')
+        prefix = 'https://' if request.is_secure() else 'http://'
+        url = prefix + request.get_host() + settings.STATIC_URL
+
+        #TODO: Find list of points for Leaderboard
+        #Get list of badges user has
+        badges = badges + project_badge_count(user,project,projbadges,url)
+
+        #Count all the values of user's points
+        pbtu = ProjectBadgeToUser.objects.filter(user__username=username,projectbadge__project=project)
+        for userbadge in pbtu:
+            total_points += userbadge.projectbadge.awardLevel
 
     rendertype = rendertype or request.accepted_renderer.format
     if rendertype == 'html':
