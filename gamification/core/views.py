@@ -318,11 +318,17 @@ def user_project_badges_list(request,username,projectname,rendertype='html'):
     prefix = 'https://' if request.is_secure() else 'http://'
     url = prefix + request.get_host() + settings.STATIC_URL
 
+    #TODO: Find list of points for Leaderboard
     badges = project_badge_count(user,project,projbadges,url)
+
+    pbtu = ProjectBadgeToUser.objects.filter(user__username=username,projectbadge__project__name=projectname)
+    total_points = 0
+    for userbadge in pbtu:
+        total_points += userbadge.projectbadge.awardLevel
 
     rendertype = rendertype or request.accepted_renderer.format
     if rendertype == 'html':
-        data = {'profile': badges}
+        data = {'profile': badges,'points':total_points}
         return Response(data, template_name='core/badge_list.html')
 
     #JSON
