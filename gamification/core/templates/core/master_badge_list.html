@@ -1,38 +1,32 @@
 {% extends "core/base.html" %}
 {% load staticfiles %}
+{% block title %}Badges by project{% endblock %}
 {% block content %}
 {% block heading %}
-
-<div class="row">
-    <div class="col-md-6 col-md-offset-2">
-        <div class="page-header">
-            <h2>All Badges</h2>
-        </div>
-    </div>
-</div>
-
 
 {% endblock %}
 <div class="container">
     <div class="row">
         <div class="col-md-10 col-md-offset-1">
+        {% regroup object_list by project__name as projects %}
+
+        {% for project in projects %}
+
+            <h2>Project: <a href='/projects/{{ project.grouper }}'>{{ project.grouper|title }}</a></h2>
             <table class="table table-bordered">
                 <thead>
                 <tr>
-                    <th>Project</th>
                     <th>Name</th>
                     <th>Icon</th>
                     <th>Description</th>
-                    <th>Points Worth</th>
-                    <th>Can win Multiple?</th>
+                    <th>Tags</th>
+                    <th>Points</th>
                 </tr>
                 </thead>
                 <tbody>
-                {% for badge in object_list %}
+
+                {% for badge in project.list %}
                 <tr>
-                    <td>
-                        {{ badge.project__description }}
-                    </td>
                     <td>
                         {{ badge.name }}
                     </td>
@@ -46,15 +40,16 @@
                         {{ badge.description }}
                     </td>
                     <td>
-                        {{ badge.awardLevel }}
+                        {{ badge.tags }}
                     </td>
                     <td>
-                        {{ badge.multipleAwards }}
+                        {{ badge.awardLevel }}
                     </td>
                 </tr>
                 {% endfor %}
                 </tbody>
             </table>
+        {% endfor %}
         </div>
     </div>
 </div>

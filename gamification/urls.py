@@ -58,7 +58,7 @@ urlpatterns = patterns("",
     url(r'^users/(?P<username>\w+)/projects/(?P<projectname>\w+)/event/?$', handle_event),
     url(r'^users/(?P<username>\w+)/assign_badge/(?P<badge>\w+)?$', assign_badge),
     url(r'^users/(?P<username>\w+)/create/?$', create_new_user),
-    url(r'^$', TemplateView.as_view(template_name="core/index.html"), name="home"),
+    url(r'^$', MasterBadgeListView.as_view(template_name="core/index.html"), name="home"),
 )
 
 # urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

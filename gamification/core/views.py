@@ -170,7 +170,7 @@ class MasterBadgeListView(ListView):
     model = ProjectBadge
 
     def get_queryset(self):
-        return ProjectBadge.objects.all().values('name','description','created','awardLevel','multipleAwards','project__description','badge__icon').order_by('project__description')
+        return ProjectBadge.objects.all().values('name','description','created','awardLevel','multipleAwards','tags','badge__icon','project__name','project__description').order_by('project__name','-awardLevel','name')
 
     def get_context_data(self, **kwargs):
         cv = super(MasterBadgeListView, self).get_context_data(**kwargs)
