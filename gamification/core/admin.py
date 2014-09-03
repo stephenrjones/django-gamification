@@ -41,10 +41,12 @@ class PointAdmin(admin.ModelAdmin):
 
 class TeamAdmin(admin.ModelAdmin):
     list_display = ('name', 'description', 'date_created')
+    filter_horizontal = ('members',)
 
 class ProjectAdmin(admin.ModelAdmin):
     model = Project
     list_filter = ("private", "active", "visual_theme")
+    filter_horizontal = ('supervisors', 'teams',)
 
     normal_fields = ('name', 'private', 'active',  'description', 'visual_theme', 'project_closing_date')
     readonly_fields = ('created_at', 'updated_at')
@@ -53,12 +55,12 @@ class ProjectAdmin(admin.ModelAdmin):
     save_as = True
 
     advanced_fields = ( 'viewing_pass_phrase', 'supervisors', 'teams', 'background_image', 'properties' )
-
     desc = 'The settings below are advanced.  Please contact and admin if you have questions.'
+
     fieldsets = (
         (None, {'fields': normal_fields}),
         ('Advanced Settings', {'classes': ('collapse',),
-                               'description': 'The settings below are advanced.  Please contact and admin if you have questions.',
+                               'description': desc,
                                'fields': advanced_fields,
                                }))
 

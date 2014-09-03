@@ -65,8 +65,8 @@ class Team(models.Model):
     background_color = models.CharField(max_length=50, null=True, blank=True, help_text='Optional - Color to use for background of all team badges')
     icon = models.ImageField(upload_to='badge_images', null=True, blank=True, help_text='Optional - Image to show next to team names')
 
-    def __unicode__(self):
-        return self.name
+    def __str__(self):
+        return "%s (%s)" % (self.name, str(len(self.members.all())))
 
     class Meta:
         ordering = ['-order', '-date_created', 'id']
