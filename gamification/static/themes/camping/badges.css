@@ -84,8 +84,6 @@
     /*border:1px solid black;*/
 }
 
-
-
 .personHeader {
     border:2px solid black;
     display:inline-block;
@@ -94,7 +92,9 @@
     border-image: url(corner_border_cyber_blue.png) 12% 8% 8% 8% round;
     border-width: 14px;
     vertical-align: top;
-
+    max-width: 470px;
+    max-height: 74px;
+    overflow-y: scroll;
 }
 .personHeaderText {
     font-family:Arial;
