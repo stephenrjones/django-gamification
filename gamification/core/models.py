@@ -41,7 +41,7 @@ class ProjectBase(models.Model):
     A generic model for GeoQ objects.
     """
 
-    active = models.BooleanField(default=True)
+    active = models.BooleanField(default=True, help_text='If checked, this project will be listed in the active list.')
     created_at = models.DateTimeField(auto_now_add=True)
     name = models.CharField(max_length=200, help_text='Name of the project.')
     description = models.TextField(help_text='Details of this project that will be listed on the viewing page.')
@@ -85,7 +85,7 @@ class Project(ProjectBase):
     )
 
     private = models.BooleanField(default=False, help_text='If checked, hide this project from the list of projects and public badge APIs.')
-    supervisors = models.ManyToManyField(User, blank=True, null=True, related_name="supervisors", help_text='Anyone other than site administrators that can add badges and update the site - Not implemented yet')
+    supervisors = models.ManyToManyField(User, blank=True, null=True, related_name="supervisors", help_text='Anyone other than site administrators that can add badges and update the site')
     teams = models.ManyToManyField(Team, blank=True, null=True)
     viewing_pass_phrase = models.CharField(max_length=200, null=True, blank=True, help_text='Phrase that must be entered to view this page.')
     project_closing_date = models.DateTimeField(null=True, blank=True, help_text='Date that project "closes" with countdown shown on project page. Badges can still be added after this.')

@@ -147,7 +147,9 @@ class ProjectAdminListView(ListView):
         context['project'] = project
         context['all_users'] = User.objects.all().order_by('username')
         context['badges'] = ProjectBadge.objects.filter(project=project)
-        context['admin'] = self.request.user.is_superuser or self.request.user.groups.filter(name='admin_group').count() > 0
+        context['admin'] = self.request.user.is_superuser or \
+                           self.request.user.groups.filter(name='admin_group').count() > 0 or \
+                           self.request.user in project.supervisors.all()
 
         return context
 

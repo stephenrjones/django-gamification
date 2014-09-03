@@ -33,10 +33,8 @@ from django.contrib import admin
 class ObjectAdmin(admin.ModelAdmin):
     list_display = ('name', 'created_at', 'updated_at')
 
-
 class UserProfileAdmin(ObjectAdmin):
     list_display = ('user','score')
-    
 
 class PointAdmin(admin.ModelAdmin):
     list_display = ('user', 'date_awarded', 'projectbadge', 'value')
@@ -44,9 +42,29 @@ class PointAdmin(admin.ModelAdmin):
 class TeamAdmin(admin.ModelAdmin):
     list_display = ('name', 'description', 'date_created')
 
+class ProjectAdmin(admin.ModelAdmin):
+    model = Project
+    list_filter = ("private", "active", "visual_theme")
+
+    normal_fields = ('name', 'private', 'active',  'description', 'visual_theme', 'project_closing_date')
+    readonly_fields = ('created_at', 'updated_at')
+
+    save_on_top = True
+    save_as = True
+
+    advanced_fields = ( 'viewing_pass_phrase', 'supervisors', 'teams', 'background_image', 'properties' )
+
+    desc = 'The settings below are advanced.  Please contact and admin if you have questions.'
+    fieldsets = (
+        (None, {'fields': normal_fields}),
+        ('Advanced Settings', {'classes': ('collapse',),
+                               'description': 'The settings below are advanced.  Please contact and admin if you have questions.',
+                               'fields': advanced_fields,
+                               }))
 
 
-admin.site.register(Project, ObjectAdmin)
+
+admin.site.register(Project, ProjectAdmin)
 #admin.site.register(UserProfile, UserProfileAdmin)
 admin.site.register(Points, PointAdmin)
 admin.site.register(Team, TeamAdmin)
