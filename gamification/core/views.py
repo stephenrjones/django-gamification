@@ -262,7 +262,16 @@ def master_project_list(request):
     queryset = Project.objects.filter(private=False)
 
     if request.accepted_renderer.format == 'html':
-        data = {'object_list': queryset}
+        actives = []
+        non_actives = []
+        for project in queryset:
+            if project.active:
+                actives.append(project)
+            else:
+                non_actives.append(project)
+
+        data = {'active_projects': actives,
+                'non_active_projects': non_actives}
         return Response(data, template_name='core/projects.html')
 
     # JSONRenderer

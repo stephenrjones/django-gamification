@@ -29,7 +29,7 @@ from django.core.urlresolvers import reverse
 from django.utils.datastructures import SortedDict
 from django.db.models.signals import post_save
 from django.db import models
-from gamification.badges.models import ProjectBadge
+from gamification.badges.models import ProjectBadge, ProjectBadgeToUser
 from jsonfield import JSONField
 
 
@@ -99,10 +99,14 @@ class Project(ProjectBase):
 
     @property
     def user_count(self):
-        return User.objects.filter(analysts__project__id=self.id).distinct().count()
+        return User.objects.filter(projectbadgetouser__projectbadge__project=self).distinct().count()
+
+    @property
+    def badge_count(self):
+        return ProjectBadgeToUser.objects.filter(projectbadge__project=self).count()
 
     def get_absolute_url(self):
-        return reverse('project-detail', args=[self.id])
+        return reverse('project-list', args=[self.name])
 
 class Points(models.Model):
     user = models.ForeignKey(User)
