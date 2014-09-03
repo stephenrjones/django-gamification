@@ -84,7 +84,7 @@ class Project(ProjectBase):
         ("map", "Geospatial"),
     )
 
-    private = models.BooleanField(default=False, help_text='Make this project available to all users.')
+    private = models.BooleanField(default=False, help_text='If checked, hide this project from the list of projects and public badge APIs.')
     supervisors = models.ManyToManyField(User, blank=True, null=True, related_name="supervisors", help_text='Anyone other than site administrators that can add badges and update the site - Not implemented yet')
     teams = models.ManyToManyField(Team, blank=True, null=True)
     viewing_pass_phrase = models.CharField(max_length=200, null=True, blank=True, help_text='Phrase that must be entered to view this page.')

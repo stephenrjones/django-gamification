@@ -170,7 +170,7 @@ class MasterBadgeListView(ListView):
     model = ProjectBadge
 
     def get_queryset(self):
-        return ProjectBadge.objects.all().values('name','description','created','awardLevel','multipleAwards','tags','badge__icon','project__name','project__description').order_by('project__name','-awardLevel','name')
+        return ProjectBadge.objects.filter(project__private=False).values('name','description','created','awardLevel','multipleAwards','tags','badge__icon','project__name','project__description').order_by('project__name','-awardLevel','name')
 
     def get_context_data(self, **kwargs):
         cv = super(MasterBadgeListView, self).get_context_data(**kwargs)
@@ -259,7 +259,7 @@ def projects(request, *args, **kwargs):
 @api_view(('GET',))
 @renderer_classes((renderers.TemplateHTMLRenderer,renderers.JSONRenderer))
 def master_project_list(request):
-    queryset = Project.objects.all()
+    queryset = Project.objects.filter(private=False)
 
     if request.accepted_renderer.format == 'html':
         data = {'object_list': queryset}
