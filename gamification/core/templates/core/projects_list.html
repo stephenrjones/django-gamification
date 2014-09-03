@@ -22,13 +22,13 @@
         $(document).ready(function(){
             $('#enter_phrase').click(function(){
                 var phrase = $('#entry_code').val();
-                document.location.href = "/projects/{{ project.name }}/" + phrase;
+                document.location.href = "{{ project.get_absolute_url }}/" + phrase;
             });
 
             $('#entry_code').on('input',function(){
                 var phrase = $('#entry_code').val();
                 var $form = $('#phrase_form');
-                $form.attr('action',"/projects/{{ project.name }}/" + phrase);
+                $form.attr('action',"{{ project.get_absolute_url }}/" + phrase);
             });
 
         });
