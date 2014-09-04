@@ -75,19 +75,37 @@ def project_badge_awards(project):
     """
     ids = ProjectBadge.objects.filter(project=project).values('id')
 
-    user_badges = ProjectBadgeToUser.objects.filter(projectbadge__in=ids).values('user__username', 'projectbadge__name', 'created', 'projectbadge__badge__icon', 'projectbadge__awardLevel', 'projectbadge__tags')
+    user_badges = ProjectBadgeToUser.objects.filter(projectbadge__in=ids)\
+        .values('user__username', 'projectbadge__name', 'created', 'projectbadge__badge__icon', 'projectbadge__awardLevel', 'projectbadge__tags')
+
+    project_teams = project[0].teams.all()
 
     from collections import defaultdict
     groups = defaultdict(list)
     scores = defaultdict(int)
+    teams = defaultdict(str)
     for obj in user_badges:
-        groups[obj['user__username']].append({'badge':str(obj['projectbadge__name']),'date':str(obj['created']),'icon':str(obj['projectbadge__badge__icon']),'tags':str(obj['projectbadge__tags']),'points':str(obj['projectbadge__awardLevel'])})
-        scores[obj['user__username']] += obj['projectbadge__awardLevel']
+        username = obj['user__username']
+        groups[username].append({
+            'badge':str(obj['projectbadge__name']),
+            'date':str(obj['created']),
+            'icon':str(obj['projectbadge__badge__icon']),
+            'tags':str(obj['projectbadge__tags']),
+            'points':str(obj['projectbadge__awardLevel'])})
+
+        #Find any teams the user is on that are on this project
+        user_team = ''
+        for project_team in project_teams:
+            if username in [(u.username) for u in project_team.members.all()]:
+                user_team = str(project_team.name)
+        teams[username] = user_team
+
+        scores[username] += obj['projectbadge__awardLevel']
 
     #add scores
     items = groups.items()
     for i in range(len(items)):
-        items[i] = items[i] + (scores[items[i][0]],)
+        items[i] = items[i] + (scores[items[i][0]],) + (teams[items[i][0]],)
 
     return sorted(items, key=lambda rec: rec[2],reverse=True)
 

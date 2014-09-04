@@ -12,7 +12,7 @@
 
         {% for project in projects %}
 
-            <h2>Project: <a href='/projects/{{ project.grouper }}'>{{ project.grouper|title }}</a></h2>
+            <h2>Project: <a href='/projects/{{ project.grouper }}'>{{ project.grouper|capfirst }}</a></h2>
             <table class="table table-bordered">
                 <thead>
                 <tr>
