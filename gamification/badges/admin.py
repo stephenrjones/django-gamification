@@ -13,8 +13,8 @@ class BadgeAdmin(admin.ModelAdmin):
     
     
 class ProjectBadgeAdmin(admin.ModelAdmin):
-    fields = ('name','description','project','badge')
-    list_display = ('name', 'description')
+    list_display = ('name','description','awardLevel')
+    fields = ('name','description','project','badge','awardLevel','multipleAwards','tags')
 
 class BadgeSettingsAdmin(admin.ModelAdmin):
     fields = ('awardLevel','multipleAwards')
@@ -33,6 +33,6 @@ class ProjectBadgeToUserAdmin(admin.ModelAdmin):
     form = ProjectBadgeToUserAdminForm
 
 admin.site.register(Badge, BadgeAdmin)
-admin.site.register(BadgeSettings, BadgeSettingsAdmin)
+#admin.site.register(BadgeSettings, BadgeSettingsAdmin)
 admin.site.register(ProjectBadge, ProjectBadgeAdmin)
 admin.site.register(ProjectBadgeToUser, ProjectBadgeToUserAdmin)

@@ -5,7 +5,7 @@
         "fields": {
             "project": 5,
             "type": 0,
-            "projectbadge": 11,
+            "projectbadge": 23,
             "rule": "from gamification.events.models import Event\nimport datetime\nrule 'Rule 1':\n\twhen:\n\t\t$event := Event(('event_type' in details_map) and ('attendance' == details_map['event_type']) and (dtg.date() >= datetime.date(2014,7,21)) and (dtg.date() <= datetime.date(2014,7,25)))\n\tthen:\n\t\t$event.update_state('attendance', $event.event_dtg.date(), \"\")\n"
         }
     },
@@ -15,7 +15,7 @@
         "fields": {
             "project": 5,
             "type": 1,
-            "projectbadge": 11,
+            "projectbadge": 23,
             "rule": "from gamification.events.state import State\nimport datetime\nrule 'Rule 1':\n\twhen:\n\t\t$state := State(('attendance' in event_data) and (datetime.date(2014,7,21) in event_data['attendance']) and (datetime.date(2014,7,22) in event_data['attendance']) and (datetime.date(2014,7,23) in event_data['attendance']) and (datetime.date(2014,7,24) in event_data['attendance']) and (datetime.date(2014,7,25) in event_data['attendance']))\n\tthen:\n\t\t$state.award($state.user, $state.project)\n"
         }
     },
@@ -25,7 +25,7 @@
         "fields": {
             "project": 5,
             "type": 0,
-            "projectbadge": 12,
+            "projectbadge": 24,
             "rule": "from gamification.events.models import Event\nimport datetime\nrule 'Rule 1':\n\twhen:\n\t\t$event := Event(('event_type' in details_map) and ('attendance' == details_map['event_type']) and (dtg.date() >= datetime.date(2014,7,29)) and (dtg.date() <= datetime.date(2014,8,1)))\n\tthen:\n\t\t$event.update_state('attendance', $event.event_dtg.date(), \"\")\n"
         }
     },
@@ -35,7 +35,7 @@
         "fields": {
             "project": 5,
             "type": 1,
-            "projectbadge": 12,
+            "projectbadge": 24,
             "rule": "from gamification.events.state import State\nimport datetime\nrule 'Rule 1':\n\twhen:\n\t\t$state := State(('attendance' in event_data) and (datetime.date(2014,7,28) in event_data['attendance']) and (datetime.date(2014,7,29) in event_data['attendance']) and (datetime.date(2014,7,30) in event_data['attendance']) and (datetime.date(2014,7,31) in event_data['attendance']) and (datetime.date(2014,8,1) in event_data['attendance']))\n\tthen:\n\t\t$state.award($state.user, $state.project)\n"
         }
     },
@@ -45,7 +45,7 @@
         "fields": {
             "project": 5,
             "type": 0,
-            "projectbadge": 10,
+            "projectbadge": 22,
             "rule": "from gamification.events.models import Event\nimport datetime\nrule 'Rule 1':\n\twhen:\n\t\t$event := Event(('event_type' in details_map) and ('attendance' == details_map['event_type']) and (dtg.date() >= datetime.date(2014,7,14)) and (dtg.date() <= datetime.date(2014,7,18)))\n\tthen:\n\t\t$event.update_state('attendance', $event.event_dtg.date(), \"\")\n"
         }
     },
@@ -55,7 +55,7 @@
         "fields": {
             "project": 5,
             "type": 1,
-            "projectbadge": 10,
+            "projectbadge": 22,
             "rule": "from gamification.events.state import State\nimport datetime\nrule 'Rule 1':\n\twhen:\n\t\t$state := State(('attendance' in event_data) and (datetime.date(2014,7,14) in event_data['attendance']) and (datetime.date(2014,7,15) in event_data['attendance']) and (datetime.date(2014,7,16) in event_data['attendance']) and (datetime.date(2014,7,17) in event_data['attendance']) and (datetime.date(2014,7,18) in event_data['attendance']))\n\tthen:\n\t\t$state.award($state.user, $state.project)\n"
         }
     },

@@ -26,7 +26,7 @@ else:
 class Badge(models.Model):
     name = models.CharField(max_length=255)
     level = models.CharField(max_length=1, choices=LEVEL_CHOICES)    
-    icon = models.ImageField(upload_to='badge_images')
+    icon = models.ImageField(upload_to='badge_images', default='', null=True, blank=True )
     value = 1
     
     objects = BadgeManager()
@@ -58,11 +58,12 @@ class ProjectBadge(models.Model):
     project = models.ForeignKey('core.Project')
     badge = models.ForeignKey('Badge')
     user = models.ManyToManyField(User, related_name="badges", through='ProjectBadgeToUser')
-    name = models.CharField(max_length=255)    
+    name = models.CharField(max_length=255)
     description = models.TextField()
     created = models.DateTimeField(default=datetime.now)
     awardLevel = models.IntegerField(default=1)
     multipleAwards = models.BooleanField(default=True)
+    tags = models.CharField(max_length=400, default='', null=True, blank=True, help_text='Tags associated with this badge. Use a few small words separated by commas.')
 
     @property
     def meta_badge(self):
@@ -110,7 +111,7 @@ class ProjectBadgeToUser(models.Model):
         verbose_name_plural = "Awarded Badges"
 
 class BadgeSettings(models.Model):
-    awardLevel = models.IntegerField(default=1000)
+    awardLevel = models.IntegerField(default=1)
     multipleAwards = models.BooleanField(default=True)
 
     class Meta:

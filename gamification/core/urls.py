@@ -35,8 +35,8 @@ urlpatterns = patterns('',
     url(r'^projects/(?P<projectname>\w+)/points/?$', user_project_points_list),
     url(r'^projects/(?P<projectname>\w+)/points/?format=(?P<rendertype>\w+)?$', user_project_points_list),
     url(r'^projects/(?P<projectname>\w+)/total/?$', user_points),
-    url(r'^projects/(?P<projectname>\w+)/badges/?$', user_project_badges_list),
-    url(r'^projects/(?P<projectname>\w+)/badges/?format=(?P<rendertype>\w+)?$', user_project_badges_list),
+    url(r'^projects/(?P<projectname>[\w,]+)/badges/?$', user_project_badges_list),
+    url(r'^projects/(?P<projectname>[\w,]+)/badges/?format=(?P<rendertype>\w+)?$', user_project_badges_list),
 
     # POINTS
     url(r'^points/?$', user_points_list),
