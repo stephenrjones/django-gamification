@@ -39,7 +39,7 @@ from django.shortcuts import render, get_object_or_404
 import json
 from gamification.badges.utils import project_badge_count
 from gamification.core.utils import badge_count,top_n_badge_winners,user_project_badge_count, top_n_project_badge_winners,\
-project_badge_awards, users_project_points
+project_badge_awards, users_project_points, get_files_in_dir
 
 from gamification.core.models import Project
 from gamification.core.forms import AwardForm
@@ -115,8 +115,22 @@ class ProjectListView(ListView):
         projects = context['object_list']
         context['top_n_badges'] = top_n_badge_winners(projects,5)
         context['badge_awards'] = project_badge_awards(projects)
+        context['badge_awards_json'] = json.dumps(context['badge_awards'])
         context['project'] = projects[0]
+        context['properties_json'] = json.dumps(projects[0].properties or {})
+
         context['code'] = phrase
+        if projects[0].visual_theme:
+            try:
+                files = get_files_in_dir("gamification/static/themes/" + projects[0].visual_theme)
+                js_files = [ f for f in files if f.endswith(".js") ]
+
+                context['theme_files'] = json.dumps(js_files, ensure_ascii=False)
+                context['theme_files_js'] = [ f for f in files if f.endswith(".js") ]
+                context['theme_files_css'] = [ f for f in files if f.endswith(".css") ]
+            except Exception, e:
+                context['theme_files_error'] = str(e)
+
         context['admin'] = self.request.user.is_superuser or self.request.user.groups.filter(name='admin_group').count() > 0
         return context
 
@@ -134,9 +148,11 @@ class ProjectAdminListView(ListView):
         project = context['object_list'][0]
 
         context['project'] = project
-        context['all_users'] = User.objects.all()
+        context['all_users'] = User.objects.all().order_by('username')
         context['badges'] = ProjectBadge.objects.filter(project=project)
-        context['admin'] = self.request.user.is_superuser or self.request.user.groups.filter(name='admin_group').count() > 0
+        context['admin'] = self.request.user.is_superuser or \
+                           self.request.user.groups.filter(name='admin_group').count() > 0 or \
+                           self.request.user in project.supervisors.all()
 
         return context
 
@@ -159,7 +175,7 @@ class MasterBadgeListView(ListView):
     model = ProjectBadge
 
     def get_queryset(self):
-        return ProjectBadge.objects.all().values('name','description','created','awardLevel','multipleAwards','project__description','badge__icon').order_by('project__description')
+        return ProjectBadge.objects.filter(project__private=False).values('name','description','created','awardLevel','multipleAwards','tags','badge__icon','project__name','project__description').order_by('project__name','-awardLevel','name')
 
     def get_context_data(self, **kwargs):
         cv = super(MasterBadgeListView, self).get_context_data(**kwargs)
@@ -248,10 +264,19 @@ def projects(request, *args, **kwargs):
 @api_view(('GET',))
 @renderer_classes((renderers.TemplateHTMLRenderer,renderers.JSONRenderer))
 def master_project_list(request):
-    queryset = Project.objects.all()
+    queryset = Project.objects.filter(private=False)
 
     if request.accepted_renderer.format == 'html':
-        data = {'object_list': queryset}
+        actives = []
+        non_actives = []
+        for project in queryset:
+            if project.active:
+                actives.append(project)
+            else:
+                non_actives.append(project)
+
+        data = {'active_projects': actives,
+                'non_active_projects': non_actives}
         return Response(data, template_name='core/projects.html')
 
     # JSONRenderer
@@ -302,16 +327,31 @@ def user_project_points_list(request,username,projectname,rendertype='html'):
 @renderer_classes((renderers.TemplateHTMLRenderer,renderers.JSONRenderer))
 def user_project_badges_list(request,username,projectname,rendertype='html'):
     user = get_object_or_404(User, username=username)
-    project = get_object_or_404(Project, name=projectname)
-    projbadges = ProjectBadge.objects.filter(project=project).order_by('badge__level')
-    prefix = 'https://' if request.is_secure() else 'http://'
-    url = prefix + request.get_host() + settings.STATIC_URL
 
-    badges = project_badge_count(user,project,projbadges,url)
+    project_names = projectname.split(',')
+    projects = Project.objects.filter(name__in=project_names)
+
+    total_points = 0
+    badges = []
+    for project in projects:
+
+        #Find all badges from the project
+        projbadges = ProjectBadge.objects.filter(project=project).order_by('badge__level')
+        prefix = 'https://' if request.is_secure() else 'http://'
+        url = prefix + request.get_host() + settings.STATIC_URL
+
+        #TODO: Find list of points for Leaderboard
+        #Get list of badges user has
+        badges = badges + project_badge_count(user,project,projbadges,url)
+
+        #Count all the values of user's points
+        pbtu = ProjectBadgeToUser.objects.filter(user__username=username,projectbadge__project=project)
+        for userbadge in pbtu:
+            total_points += userbadge.projectbadge.awardLevel
 
     rendertype = rendertype or request.accepted_renderer.format
     if rendertype == 'html':
-        data = {'profile': badges}
+        data = {'profile': badges,'points':total_points}
         return Response(data, template_name='core/badge_list.html')
 
     #JSON

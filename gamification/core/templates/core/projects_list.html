@@ -1,15 +1,16 @@
 {% extends 'core/base.html' %}
+{% block title %}{{ project.name|capfirst }} - Gamification Server{% endblock %}
 
 {% block header_title %}
     <div id="header_title">
-        <h1>{{ project.name|title }}</h1>
+        <h1>{{ project.name|capfirst }}</h1>
         <b>{{ project.description|capfirst|default:"Gamification Project" }}</b>
     </div>
 {% endblock %}
 
 {% block content %}
 
-{% if project.viewing_pass_phrase  and project.viewing_pass_phrase != code %}
+{% if project.viewing_pass_phrase and project.viewing_pass_phrase != code %}
     <form method="get" id="phrase_form" action="">{% csrf_token %}
         This page is protected from public viewing. Please enter entry code: <input type="text" id="entry_code" />
         <input type="button" id="enter_phrase" value="Reveal Results"/>
@@ -21,56 +22,44 @@
         $(document).ready(function(){
             $('#enter_phrase').click(function(){
                 var phrase = $('#entry_code').val();
-                document.location.href = "/projects/{{ project.name }}/" + phrase;
+                document.location.href = "{{ project.get_absolute_url }}/" + phrase;
             });
 
             $('#entry_code').on('input',function(){
                 var phrase = $('#entry_code').val();
                 var $form = $('#phrase_form');
-                $form.attr('action',"/projects/{{ project.name }}/" + phrase);
+                $form.attr('action',"{{ project.get_absolute_url }}/" + phrase);
             });
 
         });
     </script>
 {% else %}
-    <style>
-        div.row {
-            margin-left: 0px;
-        }
-        .badge-row.leader {
-            padding: 0px; line-height: 1em;
-        }
-        .badge-row.leader img{
-            padding: 0px;width: 24px;vertical-align: baseline;
-        }
 
-        .badge-row {
-            padding:5px; border:1px solid gray
+    <script src="{{ STATIC_URL }}js/maths.js"></script>
+    {% for file in theme_files_js %}
+    <script src="{{ STATIC_URL }}themes/{{ project.visual_theme }}/{{ file }}"></script>
+    {% endfor %}
+
+    {% if project.project_closing_date %}
+    <script src="{{ STATIC_URL }}js/TimeCircles/TimeCircles.js"></script>
+    <link rel="stylesheet" href="{{ STATIC_URL }}js/TimeCircles/TimeCircles.css">
+    {%  endif %}
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/project_list.css">
+
+    {% for file in theme_files_css %}
+    <link rel="stylesheet" href="{{ STATIC_URL }}themes/{{ project.visual_theme }}/{{ file }}">
+    {% endfor %}
+
+    <style>
+        {%  if project.background_image %}
+        html {
+            background: url({{ STATIC_URL }}{{ project.background_image }}) no-repeat center center fixed;
+            -webkit-background-size: cover;
+            -moz-background-size: cover;
+            -o-background-size: cover;
+            background-size: cover;
         }
-        .badge-row h4 {
-            margin: 0px 0px 5px 0px;
-        }
-        .badge-row:nth-child(even) {
-            background-color: lightcyan;
-        }
-        .badge-row:nth-child(odd) {
-            background-color: lightyellow;
-        }
-        .badge-row span.dtg {
-            display: inline; padding: 0px;
-        }
-        .badge-row span.awardee {
-            display: inline; padding: 0px; width: 150px;
-        }
-        .badge-row span {
-            display: inline-block; vertical-align: top; padding:10px;
-        }
-        #header_title h1{
-            margin:0px;
-        }
-        #header_title {
-            margin-bottom: 20px;
-        }
+        {% endif %}
     </style>
     <script>
         var project_info = {};
@@ -78,6 +67,11 @@
         project_info.description = '{{ project.description|default:"" }}';
         project_info.name = '{{ project.name|default:"" }}';
         project_info.id = '{{ project.id }}';
+        project_info.properties = {{ properties_json|safe }};
+        {% autoescape off %}
+        project_info.badge_json = {{ badge_awards_json|default:"''" }};
+        project_info.theme_files = {{ theme_files|safe|default:"''" }};
+        {% endautoescape %}
 
         $(document).ready(function(){
             $('.dtg').each(function(){
@@ -89,41 +83,77 @@
                     $item.text('Awarded '+newtime);
                 }
             });
+
+            {% if project.project_closing_date %}
+            $(".countdown_clock").TimeCircles();
+            {% endif %}
+
+            //Highlight the first tab
+            $('.nav-tabs li').first().addClass('active');
+            $('.tab-content > .tab-pane').first().addClass('active');
+
+
+            //Count number of teams, and if any add displays
+            var _teams = _.groupBy(project_info.badge_json,function(b){return b[3]});
+            var iname_count = 0; for (iname in _teams) {if (iname) iname_count++};
+            if (iname_count > 1) {
+                var $leaderboard = $('#leader_board_table');
+                _.each(_teams,function(team,team_name){
+                    team_name = team_name || "No team";
+                    var team_points = 0;
+                    var team_badges = 0;
+                    _.each(team,function(member){
+                        team_points+=member[2];
+                        team_badges+=member[1].length;
+                    });
+                    $('<div>')
+                        .css({display:'inline-block',padding:'6px',margin:'4px',textAlign:'center',width:'200px',height:'120px',border:'2px solid black',borderRadius:'8px',backgroundColor:'lightblue',opacity:0.8})
+                        .html("<h3>"+team_name+"</h3><h4>Points: "+team_points+"</h4><h4>Badges: "+team_badges+"</h4>")
+                        .prependTo($leaderboard);
+                });
+            }
+
+
         });
     </script>
 
     <ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
-        <li class="active"><a href="#leader_board" data-toggle="tab">Leader board</a></li>
+        <li><a href="#leader_board" data-toggle="tab">Leader board</a></li>
         <li><a href="#badge_leaders" data-toggle="tab">Badge Leaders</a></li>
         <li><a href="#badge_list" data-toggle="tab">Badge List</a></li>
+        {% if project.project_closing_date %}
+        <li><a href="#data_graph" data-toggle="tab">Project Data</a></li>
+        {%  endif %}
     </ul>
     <div id="my-tab-content" class="tab-content">
-        <div class="tab-pane active" id="leader_board">
-            <h1>Leader Board</h1>
+        <div class="tab-pane" id="leader_board">
 
-                {# -- Leader Board -- #}
-                {% for awardee,badges,score in badge_awards %}
+            {# -- Leader Board -- #}
+            <div id="leader_board_table">
+                {% for awardee,badges,score,team in badge_awards %}
                 <div class="row badge-row leader">
-                    <span style="width: 80px;"><b>{{ awardee|capfirst }}</b></span>
+                    <span style="width: 140px;"><b>{{ awardee|capfirst }}</b>
+                    {% if team %}[{{ team|capfirst }}]{% endif %}
+                    </span>
                     <span><b>{{ score }}: </b></span>
                     {% for badge in badges %}
                         <img src="/static/{{ badge.icon }}" title="{{ badge.badge }}"/>
                     {% endfor %}
                 </div>
                 {% endfor %}
+            </div>
 
         </div>
         <div class="tab-pane" id="badge_leaders">
-            <h1>Badge Leaders</h1>
 
                 {# -- Top Badge Winners -- #}
-                {% for top_badge in top_n_badges %}
+                {% for top_badge in top_n_badges|dictsortreversed:"awardLevel" %}
                 <div class="row badge-row">
                     <span style="width: 100px;">
                         <img src="/static/{{  top_badge.badge__icon|default:'badge_icons/default.png' }}" width="90"/>
                     </span>
                     <span style="width: 500px;">
-                        <b>{{ top_badge.name|title }}</b><br/>
+                        <b>{{ top_badge.name|title }} ({{ top_badge.awardLevel }} point{{ top_badge.awardLevel|pluralize }})</b><br/>
                         <i>{{ top_badge.description|capfirst }}</i>
                     </span>
                     <span>
@@ -141,26 +171,37 @@
 
         </div>
         <div class="tab-pane" id="badge_list">
-            <h1>Badge List</h1>
 
                 {# -- All Badge Recipients -- #}
-                {% for awardee,badges in badge_awards %}
+                {% for awardee,badges,score,team in badge_awards %}
                 <div class="row badge-row">
-                    <span style="width: 100px;"><b>{{ awardee }}</b></span>
+                    <span style="width: 100px;"><b>{{ awardee }}</b>
+                    {% if team %}<br/>[{{ team|capfirst }}]{% endif %}
+                    </span>
                     <span>
-                        <b>{{ badges|length }} Badge{{ badges|pluralize }}:</b>
+                        <b>{{ badges|length }} Badge{{ badges|pluralize }} - {{ score }} point{{ score|pluralize }}:</b>
                         {% for badge in badges %}
-                            <li><img src="/static/{{ badge.icon }}" style="width: 20px"/> <span class="awardee"><b>{{ badge.badge|title }}</b></span>: <span class="dtg">{{ badge.date }}</span></li>
+                            <li><img src="/static/{{ badge.icon }}" style="width: 20px"/> <span class="awardee"><b>{{ badge.badge|title }}</b></span>: {{ badge.points }} point{{ badge.points|pluralize }} - <span class="dtg">{{ badge.date }}</span></li>
                         {% endfor %}
                     </span>
                 </div>
                 {% endfor %}
 
         </div>
+
+        {% if project.project_closing_date %}
+        <div class="tab-pane" id="data_graph">
+                {# -- Coundown clock -- #}
+                <div style="font-size: 20px;font-weight: bold;">
+                    Project closes in: <div class="countdown_clock" data-date="{{ project.project_closing_date|date:"Y-m-d" }} {{ project.project_closing_date|time:"H:i:s" }}" style="height:100px"></div>
+                </div>
+        </div>
+        {% endif %}
+
     </div>
 
     {%  if admin %}
-        <button type="button" class="btn btn-primary btn-sm" onclick="location.href='/projects/{{ project.name }}/admin'">Admin: Add Badges to Users</button>
+        <button type="button" class="btn btn-primary btn-sm" onclick="location.href='{{ project.get_absolute_url }}/admin'">Admin: Add Badges to Users</button>
     {%  endif %}
 
 {% endif %}

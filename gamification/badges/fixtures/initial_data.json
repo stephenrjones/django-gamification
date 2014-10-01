@@ -34,7 +34,7 @@
         "name": "Gold", 
         "created": "2013-12-12T17:58:15.381Z", 
         "project": 3, 
-        "awardLevel": 1000, 
+        "awardLevel": 10,
         "badge": 3, 
         "description": "Gold badge"
     }
@@ -47,7 +47,7 @@
         "name": "Silver", 
         "created": "2013-12-12T17:58:35.170Z", 
         "project": 3, 
-        "awardLevel": 1000, 
+        "awardLevel": 5,
         "badge": 2, 
         "description": "Silver award"
     }
@@ -60,7 +60,7 @@
         "name": "Bronze", 
         "created": "2013-12-12T19:24:48.592Z", 
         "project": 3, 
-        "awardLevel": 1000, 
+        "awardLevel": 1,
         "badge": 1, 
         "description": "Bronze award"
     }
@@ -73,7 +73,7 @@
         "name": "contributer", 
         "created": "2014-05-05T17:33:06.034Z", 
         "project": 4, 
-        "awardLevel": 1000, 
+        "awardLevel": 1,
         "badge": 1, 
         "description": "Contributer to NGA Connect"
     }

@@ -67,7 +67,7 @@ def project_badge_count(user, project, badge_choices, url):
     badges = ProjectBadgeToUser.objects.all()
     badge_counts = badges.filter(user=user)
 
-    badge_counts = badge_counts.values('projectbadge__name','projectbadge__badge__icon', 'projectbadge__badge__level', 'projectbadge__description').order_by('projectbadge__badge__level')
+    badge_counts = badge_counts.values('projectbadge__name','projectbadge__badge__icon', 'projectbadge__badge__level', 'projectbadge__description','projectbadge__project__name').order_by('projectbadge__badge__level')
     badge_counts = badge_counts.annotate(count=models.Count('projectbadge__name'))
 
     def get_badge_count(badge):
@@ -79,7 +79,7 @@ def project_badge_count(user, project, badge_choices, url):
         else:
             # if the user has no badges at this level, return the appropriate response
             return {'count': 0, 'projectbadge__name': badge.name, 'projectbadge__badge__icon': url + badge.badge.icon.url,
-                        'level':badge.badge.level, 'projectbadge__description':badge.description}
+                        'level':badge.badge.level, 'projectbadge__description':badge.description, 'projectbadge__project__name':project.name}
 
     return [get_badge_count(badge) for badge in badge_choices]
 
