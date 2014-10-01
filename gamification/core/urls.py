@@ -24,7 +24,7 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 from django.conf.urls import patterns, url, include
-from views import user_points_list, user_project_points_list, user_project_badges_list, user_points
+from views import *
 
 
 urlpatterns = patterns('',
@@ -40,4 +40,5 @@ urlpatterns = patterns('',
 
     # POINTS
     url(r'^points/?$', user_points_list),
+
 )

@@ -30,6 +30,8 @@ from django.db.models import Sum
 from django.http import HttpResponseRedirect
 from django.conf import settings
 from django.utils.datastructures import SortedDict
+from django.core.urlresolvers import reverse
+from django.core.exceptions import ObjectDoesNotExist
 from models import Project, Points
 from gamification.badges.models import ProjectBadge, ProjectBadgeToUser
 from django.http import HttpResponse, HttpResponseRedirect, Http404
@@ -46,6 +48,7 @@ from rest_framework import renderers
 from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.response import Response
 from django.contrib.auth.decorators import login_required
+import mimetypes
 
 
 class PointsListView(ListView):
@@ -374,6 +377,88 @@ def create_new_user(request, *args, **kwargs):
     user = User.objects.create_user(username=username)
     user.save()
     return HttpResponse("User Created")
+    
+@api_view(('GET',))
+@renderer_classes((renderers.JSONRenderer,))
+def get_issuer(request, projectname, badgename):
+    project = get_object_or_404(Project, name=projectname)
+    d = SortedDict()
+    d['name'] = project.description
+    d['url'] = project.url
+    
+    return Response(d)
+    
+    
+@api_view(('GET',))
+def get_image(request, projectname, badgename):
+    project = get_object_or_404(Project, name=projectname)
+    projbadge = get_object_or_404(ProjectBadge, name=badgename)
+    mimetype = mimetypes.guess_type(projbadge.badge.icon.path)
+    
+    return HttpResponse(projbadge.badge.icon.read(), mimetype=mimetype)
+    
+@api_view(('GET',))
+@renderer_classes((renderers.JSONRenderer,))
+def get_metadata(request, projectname, badgename):
+    project = get_object_or_404(Project, name=projectname)
+    projbadge = get_object_or_404(ProjectBadge, name=badgename, project=project)
+    d = SortedDict()
+    d['name'] = projbadge.name
+    d['description'] = projbadge.description
+    d['image'] = request.build_absolute_uri(reverse('openbadges_image', kwargs={'projectname':projectname, \
+        'badgename':badgename}))
+    d['criteria'] = 'criteria'
+    d['issuer'] = request.build_absolute_uri(reverse('openbadges_issuer', kwargs={'projectname':projectname, \
+        'badgename':badgename}))
+    
+    return Response(d)
+    
+class PlainTextRenderer(renderers.BaseRenderer):
+    media_type = 'text/plain'
+    format = 'txt'
+    
+    def render(self, data, media_type=None, renderer_context=None):
+        return data.encode(self.charset)
+        
+    
+@api_view(('GET',))
+@renderer_classes((PlainTextRenderer,))
+def get_criteria(request, projectname, badgename):
+    project = get_object_or_404(Project, name=projectname)
+    projbadge = get_object_or_404(ProjectBadge, name=badgename, project=project)    
+    
+    return Response(projbadge.description)
+    
+@api_view(('GET',))
+@renderer_classes((renderers.JSONRenderer,))
+def get_badge_award(request, projectname, badgename, username):
+    project = get_object_or_404(Project, name=projectname)
+    projbadge = get_object_or_404(ProjectBadge, name=badgename, project=project)
+    user = get_object_or_404(User, username=username)
+    
+    try:
+        pbtu = ProjectBadgeToUser.objects.filter(projectbadge=projbadge,user=user).latest('created')
+    except ObjectDoesNotExist:
+        return HttpResponse("Award not found for that user", 404)
+
+    d = SortedDict()
+    d['uid'] = "%d#%d" % (projbadge.id,pbtu.id)
+    r = {}
+    r['type'] = "email"
+    r['hashed'] = False
+    r['identity'] = user.email
+    d['recipient'] = r
+
+    d['issuedOn'] = pbtu.created
+    d['badge'] = request.build_absolute_uri(reverse('openbadges_metadata', kwargs={'projectname':projectname, \
+        'badgename':badgename }))
+    v = {}
+    v['type'] = "hosted"
+    v['url'] = request.build_absolute_uri(request.get_full_path())
+    d['verify'] = v
+    
+    return Response(d)
+    
 
 
 

@@ -79,7 +79,7 @@ USE_TZ = True
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"
-# MEDIA_ROOT = os.path.join(PACKAGE_ROOT, "site_media", "media")
+#MEDIA_ROOT = os.path.join(PACKAGE_ROOT, "site_media", "media")
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
@@ -90,7 +90,8 @@ USE_TZ = True
 # Don"t put anything in this directory yourself; store your static files
 # in apps" "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = os.path.join(PACKAGE_ROOT, "static")
+STATIC_ROOT = '{0}'.format('/var/www/static')
+MEDIA_ROOT = os.path.join(PROJECT_ROOT, "gamification/static")
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -234,7 +235,7 @@ AUTHENTICATION_BACKENDS = [
     "account.auth_backends.UsernameAuthenticationBackend",
 ]
 
-CORS_ORIGIN_WHITELIST = ( '192.168.5.128:8000', 'localhost:8000', )
+CORS_ORIGIN_WHITELIST = ( '192.168.5.131:8000', 'localhost:8000', )
 CORS_ALLOW_METHODS = ( 'GET', 'POST', 'OPTIONS' )
 
 CACHES = {

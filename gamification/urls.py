@@ -32,9 +32,7 @@ from django.views.generic import TemplateView, ListView
 from django.contrib import admin
 admin.autodiscover()
 from gamification.core.models import Project
-from gamification.core.views import MasterProjectListView, ProjectListView, UserProjectPointsView, BadgeListView, UserView, \
-                                    MasterBadgeListView, master_project_list, project_all_badgeleaders_view, project_badgeleaders_view, \
-                                    create_new_user, ProjectAdminListView
+from gamification.core.views import *
 from gamification.events.views import handle_event, assign_badge
 
 urlpatterns = patterns("",
@@ -59,6 +57,26 @@ urlpatterns = patterns("",
     url(r'^users/(?P<username>\w+)/assign_badge/(?P<badge>\w+)?$', assign_badge),
     url(r'^users/(?P<username>\w+)/create/?$', create_new_user),
     url(r'^$', TemplateView.as_view(template_name="core/index.html"), name="home"),
+
+    # Open Badges interoperability. Define an Issuer
+    url(r'^projects/(?P<projectname>\w+)/badges/(?P<badgename>\w+)/issuer/?$', \
+        get_issuer, name="openbadges_issuer"),
+
+    # and a way to retrieve a badge's image
+    url(r'^projects/(?P<projectname>\w+)/badges/(?P<badgename>\w+)/image/?$', \
+        get_image, name="openbadges_image"),
+
+    # a badge's metadata
+    url(r'^projects/(?P<projectname>\w+)/badges/(?P<badgename>\w+)/metadata/?$', \
+        get_metadata, name="openbadges_metadata"),
+        
+    # a badge's criteria
+    url(r'projects/(?P<projectname>\w+)/badges/(?P<badgename>\w+)/criteria/?$', \
+        get_criteria, name='openbadges_criteria'),
+        
+    # badge instance metadata
+    url(r'projects/(?P<projectname>\w+)/badges/(?P<badgename>\w+)/users/(?P<username>\w+)/award/?$', \
+        get_badge_award, name='openbadges_award'),
 )
 
 # urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

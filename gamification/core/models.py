@@ -45,6 +45,7 @@ class ProjectBase(models.Model):
     name = models.CharField(max_length=200, help_text='Name of the project.')
     description = models.TextField(help_text='Details of this project that will be listed on the viewing page.')
     updated_at = models.DateTimeField(auto_now=True)
+    url = models.TextField(help_text='Project Information URL', null=True)
 
     def __unicode__(self):
         return self.name
