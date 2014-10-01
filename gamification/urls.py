@@ -57,9 +57,9 @@ urlpatterns = patterns("",
     url(r'^users/(?P<username>[\w .-@]+)/assign_badge/(?P<badge>[\w ]+)?$', assign_badge),
     url(r'^users/(?P<username>[\w .-@]+)/create/?$', create_new_user),
     url(r'^$', MasterBadgeListView.as_view(template_name="core/index.html"), name="home"),
-    url(r'^users/(?P<username>\w+)/projects/(?P<projectname>\w+)/event/?$', handle_event),
-    url(r'^users/(?P<username>\w+)/assign_badge/(?P<badge>\w+)?$', assign_badge),
-    url(r'^users/(?P<username>\w+)/create/?$', create_new_user),
+    url(r'^users/(?P<username>[\w .-@])/projects/(?P<projectname>\w+)/event/?$', handle_event),
+    url(r'^users/(?P<username>[\w .-@])/assign_badge/(?P<badge>\w+)?$', assign_badge),
+    url(r'^users/(?P<username>[\w .-@])/create/?$', create_new_user),
     url(r'^$', TemplateView.as_view(template_name="core/index.html"), name="home"),
 
     # Open Badges interoperability. Define an Issuer
@@ -79,7 +79,7 @@ urlpatterns = patterns("",
         get_criteria, name='openbadges_criteria'),
         
     # badge instance metadata
-    url(r'projects/(?P<projectname>\w+)/badges/(?P<badgename>\w+)/users/(?P<username>\w+)/award/?$', \
+    url(r'projects/(?P<projectname>\w+)/badges/(?P<badgename>\w+)/users/(?P<username>[\w .-@])/award/?$', \
         get_badge_award, name='openbadges_award'),
 )
 
